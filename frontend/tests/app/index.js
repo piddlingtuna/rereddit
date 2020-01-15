@@ -1,0 +1,76 @@
+import initApp from '../../src/main.js';
+
+describe.only('Logged out state', () => {
+  before(function(done) {
+    this.$root = document.createElement('div');
+    this.$root.id = 'root';
+    document.body.appendChild(this.$root);
+    // seed app
+    initApp('http://localhost:5000');
+
+    // provide a small delay for boot
+    setTimeout(done, 1500);
+  });
+
+  after(function() {
+    document.body.removeChild(this.$root);
+    delete this.$root;
+  });
+
+  describe('#feed', function() {
+    // verify what the endpoint returns
+    before(function() {
+      // let innerHTML
+      this.children = document.querySelectorAll('#feed *[data-id-post]');
+      return fetch('http://localhost:5000/post/public')
+        .then(data => data.json())
+        .then(({ posts }) => {
+          this.posts = posts;
+        });
+    });
+
+    it('posts are correctly populated with correct data attribute', function() {
+      expect(this.children).to.have.lengthOf(this.posts.length);
+      describe('posts', () => {
+        this.children.forEach((node, index) => {
+          describe(`post no.${index}`, () => {
+            it(`has the correct title (${this.posts[index].title})`, () => {
+              const post = node.querySelector('*[data-id-title]');
+              expect(post.innerText).to.include(this.posts[index].title || '');
+            });
+
+            it('has the correct author', () => {
+              const post = node.querySelector('*[data-id-author]');
+              expect(post.innerText).to.include(this.posts[index].meta.author|| '');
+            });
+
+            it(`has ${this.posts[index].meta.upvotes.length} upvotes`, () => {
+              const post = node.querySelector('*[data-id-upvotes]');
+              expect(post.innerText).to.include(
+                this.posts[index].meta.upvotes.length || ''
+              );
+            });
+          });
+        });
+      });
+    });
+    
+  });
+
+  describe('#nav', () => {
+    it.skip('search bar exists', () => {
+      const post = document.querySelector('input[data-id-search]');
+      expect(post).to.not.be.null;
+    });
+
+    it('login button exists', () => {
+      const post = document.querySelector('button[data-id-login]');
+      expect(post).to.not.be.null;
+    });
+
+    it('signup button exists', () => {
+      const post = document.querySelector('button[data-id-signup]');
+      expect(post).to.not.be.null;
+    });
+  });
+});
