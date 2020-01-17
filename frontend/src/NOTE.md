@@ -9,4 +9,4 @@ be able to be run by our autotests it must use -
 2. The entrypoint of your app needs to be called `main.js` and this file needs to export a function that takes a single argument, the url of the app. This will allow us to run your
 app seperately the the demos.
 
-We've provided these files for you to make it easy.s
+We've provided these files for you to make it easy.
