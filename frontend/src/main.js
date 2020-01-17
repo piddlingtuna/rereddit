@@ -165,45 +165,54 @@ function initApp(apiUrl) {
       json.posts.sort((a, b) => {
         return parseInt(a.meta.published) < parseInt(b.meta.published);
       });
-    })
-    .then(json => json.posts.map(renderFeed));
+      renderFeed(json.posts);
+    });
+
 }
 
-function renderFeed(json) {
+function renderFeed(posts) {
 
   const feed = document.getElementById('feed');
 
-  const post = document.createElement('li');
-  const postAttr = document.createAttribute('data-id-post');
-  post.setAttributeNode(postAttr);
-  post.className = 'post';
-  feed.appendChild(post);
+  for (let i = 0; i < posts.length; i++) {
+    const post = document.createElement('li');
+    const postAttr = document.createAttribute('data-id-post');
+    post.setAttributeNode(postAttr);
+    post.className = 'post';
+    feed.appendChild(post);
 
-  const vote = document.createElement('div');
-  const voteAttr = document.createAttribute('data-id-upvotes');
-  vote.setAttributeNode(voteAttr);
-  vote.className = 'vote';
-  post.appendChild(vote);
+    const vote = document.createElement('div');
+    const voteAttr = document.createAttribute('data-id-upvotes');
+    vote.setAttributeNode(voteAttr);
+    vote.className = 'vote';
+    post.appendChild(vote);
 
-  const content = document.createElement('div');
-  content.className = 'content';
-  post.appendChild(content);
+    const content = document.createElement('div');
+    content.className = 'content';
+    post.appendChild(content);
 
-  const title = document.createElement('h4');
-  const titleAttr = document.createAttribute('data-id-title');
-  title.setAttributeNode(titleAttr);
-  title.className = 'post-title alt-text';
-  const titleText = document.createTextNode(json.title);
-  title.appendChild(titleText);
-  content.appendChild(title);
+    const title = document.createElement('h4');
+    const titleAttr = document.createAttribute('data-id-title');
+    title.setAttributeNode(titleAttr);
+    title.className = 'post-title alt-text';
+    const titleText = document.createTextNode(posts[i].title);
+    title.appendChild(titleText);
+    content.appendChild(title);
 
-  const author = document.createElement('p');
-  const authorAttr = document.createAttribute('data-id-author');
-  author.setAttributeNode(authorAttr);
-  authorAttr.className = 'post-author';
-  const authorText = document.createTextNode(`Posted by u/${json.meta.author}`);
-  author.appendChild(authorText);
-  content.appendChild(author);
+    const text = document.createElement('p');
+    const textText = document.createTextNode(posts[i].text);
+    text.appendChild(textText);
+    content.appendChild(text);
+
+    const author = document.createElement('p');
+    const authorAttr = document.createAttribute('data-id-author');
+    author.setAttributeNode(authorAttr);
+    authorAttr.className = 'post-author';
+    const authorText = document.createTextNode(`Posted by u/${posts[i].meta.author}`);
+    author.appendChild(authorText);
+    content.appendChild(author);
+  }
+
 }
 
 export default initApp;
