@@ -99,41 +99,6 @@ function initApp(apiUrl) {
   feedButton.appendChild(feedButtonText);
   feedHeader.appendChild(feedButton);
 
-  // sample post
-  /*
-  const post = document.createElement('li');
-  const postAttr = document.createAttribute('data-id-post');
-  post.setAttributeNode(postAttr);
-  post.className = 'post';
-  feed.appendChild(post);
-
-  const vote = document.createElement('div');
-  const voteAttr = document.createAttribute('data-id-upvotes');
-  vote.setAttributeNode(voteAttr);
-  vote.className = 'vote';
-  post.appendChild(vote);
-
-  const content = document.createElement('div');
-  content.className = 'content';
-  post.appendChild(content);
-
-  const title = document.createElement('h4');
-  const titleAttr = document.createAttribute('data-id-title');
-  title.setAttributeNode(titleAttr);
-  title.className = 'post-title alt-text';
-  const titleText = document.createTextNode('Avenger’s Endgame Officially Passes Avatar To Become The Highest Grossing Movie Of All Time');
-  title.appendChild(titleText);
-  content.appendChild(title);
-
-  const author = document.createElement('p');
-  const authorAttr = document.createAttribute('data-id-author');
-  author.setAttributeNode(authorAttr);
-  authorAttr.className = 'post-author';
-  const authorText = document.createTextNode('Posted by @some_dude69');
-  author.appendChild(authorText);
-  content.appendChild(author);
-  */
-
   // footer
   const footer = document.createElement('footer');
   root.appendChild(footer);
@@ -145,32 +110,125 @@ function initApp(apiUrl) {
 
   // click log in
   logIn.addEventListener('click', () => {
-    prompt('Please enter username', 'username');
-    prompt('Please enter your password', 'password');
-    alert('Log in failed');
+    const username = prompt('Please enter username', 'username');
+    const password = prompt('Please enter your password', 'password');
+    const payload = {
+      'username': username,
+      'password': password,
+    }
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }
+    logInRequest(apiUrl, options);
   });
 
   // click sign up
   signUp.addEventListener('click', () => {
-    prompt('Please enter username', 'username');
-    prompt('Please enter your password', 'password');
-    alert('Sign up failed')
+    const username = prompt('Please enter username', 'username');
+    const password = prompt('Please enter your password', 'password');
+    const email = prompt('Please enter your email', 'email');
+    const name = prompt('Please enter your name', 'name');
+    const payload = {
+      'username': username,
+      'password': password,
+      'email': email,
+      'name': name
+    }
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }
+    signUpRequest(apiUrl, options);
   });
 
   // get public posts
+  renderPublicFeed(apiUrl);
+}
 
-  fetch(apiUrl + `/post/public`)
+const logInRequest = (apiUrl, options) => {
+  fetch(`${apiUrl}/auth/login`, options)
+    .then(response => {
+      if (response.status !== 200) {
+        alert('Invalid username or password');
+      } else {
+        return response.json();
+      }
+    })
+    .then(response => {
+      if (response) {
+        localStorage.setItem('token', response.token);
+        const options = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem('token')}`
+          }
+        }
+        renderUserFeed(apiUrl, options);
+      }
+    })
+}
+
+const signUpRequest = (apiUrl, options) => {
+  fetch(`${apiUrl}/auth/signup`, options)
+    .then(response => {
+      if (response.status !== 200) {
+        alert('Invalid username or password');
+      } else {
+        alert('Success!');
+        return response.json();
+      }
+    })
+    .then(response => {
+      if (response) {
+        localStorage.setItem('token', response.token);
+        const options = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem('token')}`
+          }
+        }
+        renderUserFeed(apiUrl, options);
+      }
+    })
+}
+
+const renderPublicFeed = (apiUrl) => {
+  fetch(`${apiUrl}/post/public`)
     .then(response => response.json())
     .then(json => {
       json.posts.sort((a, b) => {
         return parseInt(a.meta.published) < parseInt(b.meta.published);
       });
+      while (feed.firstChild) {
+        feed.removeChild(feed.firstChild);
+      }
       renderFeed(json.posts);
     });
-
 }
 
-function renderFeed(posts) {
+const renderUserFeed = (apiUrl, options) => {
+  fetch(`${apiUrl}/user/feed`, options)
+    .then(response => response.json())
+    .then(json => {
+      json.posts.sort((a, b) => {
+        return parseInt(a.meta.published) < parseInt(b.meta.published);
+      });
+      const feed = document.getElementById('feed');
+      while (feed.firstChild) {
+        feed.removeChild(feed.firstChild);
+      }
+      renderFeed(json.posts);
+    });
+}
+
+const renderFeed = (posts) => {
 
   const feed = document.getElementById('feed');
 
