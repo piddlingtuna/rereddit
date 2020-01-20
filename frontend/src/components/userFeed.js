@@ -80,6 +80,25 @@ const renderFeed = (apiUrl) => {
   postTextInput.setAttribute('placeholder', 'text');
   postTextControl.appendChild(postTextInput);
 
+  const postSubrereddit = document.createElement('div');
+  postSubrereddit.className = 'field';
+  postModalSection.appendChild(postSubrereddit);
+
+  const postSubreredditLabel = document.createElement('label');
+  postSubreredditLabel.className = 'label';
+  postSubreredditLabel.appendChild(document.createTextNode('Text'));
+  postSubrereddit.appendChild(postSubreredditLabel);
+
+  const postSubreredditControl = document.createElement('div');
+  postSubreredditControl.className = 'control';
+  postSubrereddit.appendChild(postSubreredditControl);
+
+  const postSubreredditInput = document.createElement('input');
+  postSubreredditInput.className = 'input';
+  postSubreredditInput.setAttribute('type', 'text');
+  postSubreredditInput.setAttribute('placeholder', 'subrereddit');
+  postSubreredditControl.appendChild(postSubreredditInput);
+
   const postModalFooter = document.createElement('footer');
   postModalFooter.className = 'modal-card-foot';
   postModalCard.appendChild(postModalFooter);
@@ -114,10 +133,12 @@ const renderFeed = (apiUrl) => {
     postSubmitButton.classList.add('is-loading');
     const title = postTitleInput.value;
     const text = postTextInput.value;
+    const subrereddit = postSubreredditInput.value;
     const token = localStorage.getItem('token');
     const payload = {
       'title': title,
       'text': text,
+      'subseddit': subrereddit
     }
     const options = {
       method: 'POST',
@@ -127,12 +148,9 @@ const renderFeed = (apiUrl) => {
       },
       body: JSON.stringify(payload)
     }
-    /*
-    console.log()
-    fetch(`${apiUrl}/post`, options)
-    .then(response => response.json())
-    .then(response => console.log(response))
-    */
+    
+    fetch(`${apiUrl}/post`, options);
+    
     postSubmitButton.classList.remove('is-loading');
     postModal.classList.remove('is-active');
     root.classList.remove('is-clipped');
@@ -272,6 +290,55 @@ const renderFeedTemplate = (apiUrl, posts) => {
     showCommentsCancelButton.className = 'button is-light';
     showCommentsCancelButton.appendChild(document.createTextNode('Cancel'));
     showCommentsModalFooter.appendChild(showCommentsCancelButton);
+
+    // show upvotes modal
+    const showUpvotesModal = document.createElement('modal');
+    showUpvotesModal.className = 'modal';
+    root.appendChild(showUpvotesModal);
+
+    const showUpvotesModalBackground = document.createElement('div');
+    showUpvotesModalBackground.className = 'modal-background';
+    showUpvotesModal.appendChild(showUpvotesModalBackground);
+
+    const showUpvotesModalCard = document.createElement('div');
+    showUpvotesModalCard.className = 'modal-content';
+    showUpvotesModal.appendChild(showUpvotesModalCard);
+
+    const showUpvotesModalHeader = document.createElement('header');
+    showUpvotesModalHeader.className = 'modal-card-head';
+    showUpvotesModalHeader.appendChild(document.createTextNode('UPVOTES'));
+    showUpvotesModalCard.appendChild(showUpvotesModalHeader);
+
+    const showUpvotesModalSection = document.createElement('section');
+    showUpvotesModalSection.className = 'modal-card-body';
+    showUpvotesModalCard.appendChild(showUpvotesModalSection);
+
+    for (let j = 0; j < posts[i].meta.upvotes.length; j++) {
+      const token = localStorage.getItem('token');
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        }
+      }
+      fetch(`${apiUrl}/user?id=${posts[i].meta.upvotes[j]}`, options)
+      .then(response => response.json())
+      .then(response => {
+        const upvotesText = document.createElement('div');
+      upvotesText.appendChild(document.createTextNode(response.username));
+      upvotesText.appendChild(document.createElement('br'));
+      showUpvotesModalSection.appendChild(upvotesText);
+      })
+    }
+
+    const showUpvotesModalFooter = document.createElement('footer');
+    showUpvotesModalFooter.className = 'modal-card-foot';
+    showUpvotesModalCard.appendChild(showUpvotesModalFooter);
+
+    const showUpvotesCancelButton = document.createElement('button');
+    showUpvotesCancelButton.className = 'button is-light';
+    showUpvotesCancelButton.appendChild(document.createTextNode('Cancel'));
+    showUpvotesModalFooter.appendChild(showUpvotesCancelButton);
     
     // event listeners
     
@@ -325,6 +392,21 @@ const renderFeedTemplate = (apiUrl, posts) => {
 
     showCommentsCancelButton.addEventListener('click', () => {
       showCommentsModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    });
+
+    showUpvotes.addEventListener('click', () => {
+      showUpvotesModal.classList.add('is-active');
+      root.classList.add('is-clipped');
+    });
+
+    showUpvotesModalBackground.addEventListener('click', () => {
+      showUpvotesModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    });
+
+    showUpvotesCancelButton.addEventListener('click', () => {
+      showUpvotesModal.classList.remove('is-active');
       root.classList.remove('is-clipped');
     });
     
