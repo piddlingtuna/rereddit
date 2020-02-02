@@ -108,8 +108,6 @@ const renderHeader = (apiUrl) => {
     profileUsername.appendChild(document.createTextNode(user.username));
     profileModalSection.appendChild(profileUsername)
 
-    profileModalSection.appendChild(document.createElement('br'));
-
     const profileEmailTitle = document.createElement('div');
     profileEmailTitle.className = 'has-text-weight-bold';
     profileEmailTitle.appendChild(document.createTextNode('Email:'));
@@ -118,8 +116,6 @@ const renderHeader = (apiUrl) => {
     const profileEmail = document.createElement('div');
     profileEmail.appendChild(document.createTextNode(user.email));
     profileModalSection.appendChild(profileEmail)
-
-    profileModalSection.appendChild(document.createElement('br'));
 
     const profileNameTitle = document.createElement('div');
     profileNameTitle.className = 'has-text-weight-bold';
@@ -130,29 +126,24 @@ const renderHeader = (apiUrl) => {
     profileName.appendChild(document.createTextNode(user.name));
     profileModalSection.appendChild(profileName)
 
-    profileModalSection.appendChild(document.createElement('br'));
+    const profileNumPostsTitle = document.createElement('div');
+    profileNumPostsTitle.className = 'has-text-weight-bold';
+    profileNumPostsTitle.appendChild(document.createTextNode('#posts:'));
+    profileModalSection.appendChild(profileNumPostsTitle);
 
-    const profilePostsTitle = document.createElement('div');
-    profilePostsTitle.className = 'has-text-weight-bold';
-    profilePostsTitle.appendChild(document.createTextNode('#posts:'));
-    profileModalSection.appendChild(profilePostsTitle);
+    const profileNumPosts = document.createElement('div');
+    profileNumPosts.appendChild(document.createTextNode(user.posts.length));
+    profileModalSection.appendChild(profileNumPosts)
 
-    const profilePosts = document.createElement('div');
-    profilePosts.appendChild(document.createTextNode(user.posts.length));
-    profileModalSection.appendChild(profilePosts)
+    const profileNumUpvotesTitle = document.createElement('div');
+    profileNumUpvotesTitle.className = 'has-text-weight-bold';
+    profileNumUpvotesTitle.appendChild(document.createTextNode('#upvotes:'));
+    profileModalSection.appendChild(profileNumUpvotesTitle);
 
-    profileModalSection.appendChild(document.createElement('br'));
-
-    const profileUpvotesTitle = document.createElement('div');
-    profileUpvotesTitle.className = 'has-text-weight-bold';
-    profileUpvotesTitle.appendChild(document.createTextNode('#upvotes:'));
-    profileModalSection.appendChild(profileUpvotesTitle);
-
-    const profileUpvotes = document.createElement('div');
-    profileUpvotes.appendChild(document.createTextNode('TODO'));
-    profileModalSection.appendChild(profileUpvotes)
-
-    profileModalSection.appendChild(document.createElement('br'));
+    fetch()
+    const profileNumUpvotes = document.createElement('div');
+    profileNumUpvotes.appendChild(document.createTextNode('TODO'));
+    profileModalSection.appendChild(profileNumUpvotes)
 
     const profileFollowingTitle = document.createElement('div');
     profileFollowingTitle.className = 'has-text-weight-bold';
@@ -163,8 +154,6 @@ const renderHeader = (apiUrl) => {
     profileFollowing.appendChild(document.createTextNode(user.following.length));
     profileModalSection.appendChild(profileFollowing)
 
-    profileModalSection.appendChild(document.createElement('br'));
-
     const profileFollowedTitle = document.createElement('div');
     profileFollowedTitle.className = 'has-text-weight-bold';
     profileFollowedTitle.appendChild(document.createTextNode('#followed:'));
@@ -172,7 +161,27 @@ const renderHeader = (apiUrl) => {
 
     const profileFollowed = document.createElement('div');
     profileFollowed.appendChild(document.createTextNode(user.followed_num));
-    profileModalSection.appendChild(profileFollowed)
+    profileModalSection.appendChild(profileFollowed);
+
+    const profilePostsTitle = document.createElement('div');
+    profilePostsTitle.className = 'has-text-weight-bold';
+    profilePostsTitle.appendChild(document.createTextNode('Posts'));
+    profileModalSection.appendChild(profilePostsTitle);
+
+    for (let j = 0; j < user.posts.length; j++) {
+      fetch(`${apiUrl}/post?id=${user.posts[j]}`, options)
+      .then(response => response.json())
+      .then(post => {
+        const profilePostTitle = document.createElement('div');
+        profilePostTitle.className = 'has-text-weight-bold';
+        profilePostTitle.appendChild(document.createTextNode(post.title));
+        profileModalSection.appendChild(profilePostTitle);
+
+        const profilePostText = document.createElement('div');
+        profilePostText.appendChild(document.createTextNode(post.text));
+        profileModalSection.appendChild(profilePostText);
+      })
+    }
 
     const profileModalFooter = document.createElement('footer');
     profileModalFooter.className = 'modal-card-foot';

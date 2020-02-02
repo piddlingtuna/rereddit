@@ -1,25 +1,25 @@
-/**
- * Written by A. Hinds with Z. Afzal 2018 for UNSW CSE.
- * 
- * Updated 2019.
- */
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
 
-// import your own scripts here.
+import Buefy from 'buefy'
+import 'buefy/dist/buefy.css'
 
-// your app must take an apiUrl as an argument --
-// this will allow us to verify your apps behaviour with 
-// different datasets.
+Vue.config.productionTip = false
 
-import { renderUser } from './components/user.js';
-import { renderStranger } from './components/stranger.js';
+Vue.use(Buefy)
 
-const initApp = (apiUrl) => {
-  const token = localStorage.getItem('item');
-  if (token) {
-    renderUser(apiUrl);
-  } else {
-    renderStranger(apiUrl);
-  }
-}
+import Navbar from '@/components/Navbar.vue';
+import Post from '@/components/Post.vue';
+import Info from '@/components/Info.vue';
 
-export default initApp;
+Vue.component('Navbar', Navbar);
+Vue.component('Post', Post);
+Vue.component('Info', Info);
+
+new Vue({
+  router,
+  store,
+  render: h => h(App)
+}).$mount('#app')

@@ -20,6 +20,9 @@ const renderFeed = (apiUrl) => {
     json.posts.sort((a, b) => {
       return parseInt(a.meta.published) < parseInt(b.meta.published);
     });
+    while(feed.firstChild) {
+      feed.removeChild(feed.firstChild);
+    }
     renderFeedTemplate(json.posts);
   });
 }
@@ -46,14 +49,14 @@ const renderFeedTemplate = (posts) => {
     meta.className = 'message-body';
     content.appendChild(meta);
 
-    const author = document.createElement('div');
-    author.className = 'is-italic'
-    author.appendChild(document.createTextNode(`Posted by u/${posts[i].meta.author}`));
-    meta.appendChild(author);
-
     const info = document.createElement('div');
     info.className = 'level';
     meta.append(info);
+
+    const author = document.createElement('div');
+    author.className = 'is-italic'
+    author.appendChild(document.createTextNode(`Posted by u/${posts[i].meta.author}`));
+    info.appendChild(author);
 
     const numUpvotes = document.createElement('div');
     numUpvotes.className = 'level-item';

@@ -7,6 +7,11 @@ const renderFeed = (apiUrl) => {
   root.appendChild(main);
 
   const feed = document.createElement('div');
+
+  while(feed.firstChild) {
+    feed.removeChild(feed.firstChild);
+  }
+
   feed.className = 'container';
   feed.style.paddingLeft = '3rem';
   feed.style.paddingRight = '3rem';
@@ -16,7 +21,6 @@ const renderFeed = (apiUrl) => {
 
   const post = document.createElement('div');
   post.className = 'button is-primary';
-  post.style.paddingBottom = '1rem';
   post.appendChild(document.createTextNode('POST'));
   feed.appendChild(post);
 
@@ -163,7 +167,7 @@ const renderFeed = (apiUrl) => {
       'Authorization': `Token ${token}`
     },
   }
-  fetch(`${apiUrl}/user/feed`, options)
+  fetch(`${apiUrl}/user/feed?p=0&n=10`, options)
   .then(response => response.json())
   .then(json => {
     json.posts.sort((a, b) => {
@@ -171,6 +175,27 @@ const renderFeed = (apiUrl) => {
     });
     renderFeedTemplate(apiUrl, json.posts);
   });
+
+  let counter = 10;
+  let go = true;
+  window.addEventListener('scroll', () => {
+    if(window.innerHeight + window.scrollY >= document.body.offsetHeight && go) {
+      fetch(`${apiUrl}/user/feed?p=${counter}&n=10`, options)
+      .then(response => response.json())
+      .then(json => {
+        json.posts.sort((a, b) => {
+          return parseInt(a.meta.published) < parseInt(b.meta.published);
+        });
+        if (json.posts.length) {
+          renderFeedTemplate(apiUrl, json.posts);
+          counter += 10;
+        } else {
+          go = false;
+        }
+      });
+    }
+  });
+
 }
   
 const renderFeedTemplate = (apiUrl, posts) => {
@@ -195,17 +220,17 @@ const renderFeedTemplate = (apiUrl, posts) => {
     meta.className = 'message-body';
     content.appendChild(meta);
 
-    const author = document.createElement('div');
-    author.className = 'is-italic'
-    author.appendChild(document.createTextNode(`Posted by u/${posts[i].meta.author}`));
-    meta.appendChild(author);
-
     const br = document.createElement('br');
     meta.appendChild(br);
 
     const info = document.createElement('div');
     info.className = 'level';
     meta.append(info);
+
+    const author = document.createElement('div');
+    author.className = 'button is-italic'
+    author.appendChild(document.createTextNode(`Posted by u/${posts[i].meta.author}`));
+    info.appendChild(author);
 
     const numUpvotes = document.createElement('div');
     numUpvotes.className = 'level-item';
@@ -250,6 +275,87 @@ const renderFeedTemplate = (apiUrl, posts) => {
     showUpvotes.className = 'button level-item is-primary';
     showUpvotes.appendChild(document.createTextNode('Show upvotes'));
     actions.appendChild(showUpvotes);
+
+    // author modal
+    const authorModal = document.createElement('modal');
+    authorModal.className = 'modal';
+    root.appendChild(authorModal);
+
+    const authorModalBackground = document.createElement('div');
+    authorModalBackground.className = 'modal-background';
+    authorModal.appendChild(authorModalBackground);
+
+    const authorModalCard = document.createElement('div');
+    authorModalCard.className = 'modal-content';
+    authorModal.appendChild(authorModalCard);
+
+    const authorModalHeader = document.createElement('header');
+    authorModalHeader.className = 'modal-card-head';
+    authorModalHeader.appendChild(document.createTextNode(posts[i].meta.author));
+    authorModalCard.appendChild(authorModalHeader);
+
+    const authorModalSection = document.createElement('section');
+    authorModalSection.className = 'modal-card-body';
+    authorModalCard.appendChild(authorModalSection);
+
+    const authorModalFooter = document.createElement('footer');
+    authorModalFooter.className = 'modal-card-foot';
+    authorModalCard.appendChild(authorModalFooter);
+
+    const authorCancelButton = document.createElement('button');
+    authorCancelButton.className = 'button is-light';
+    authorCancelButton.appendChild(document.createTextNode('Cancel'));
+    authorModalFooter.appendChild(authorCancelButton);
+
+    // comment modal
+    const commentModal = document.createElement('modal');
+    commentModal.className = 'modal';
+    root.appendChild(commentModal);
+
+    const commentModalBackground = document.createElement('div');
+    commentModalBackground.className = 'modal-background';
+    commentModal.appendChild(commentModalBackground);
+
+    const commentModalCard = document.createElement('div');
+    commentModalCard.className = 'modal-content';
+    commentModal.appendChild(commentModalCard);
+
+    const commentModalHeader = document.createElement('header');
+    commentModalHeader.className = 'modal-card-head';
+    commentModalHeader.appendChild(document.createTextNode('COMMENT'));
+    commentModalCard.appendChild(commentModalHeader);
+
+    const commentModalSection = document.createElement('section');
+    commentModalSection.className = 'modal-card-body';
+    commentModalCard.appendChild(commentModalSection);
+
+    const commentText = document.createElement('div');
+    commentText.className = 'field';
+    commentModalSection.appendChild(commentText);
+
+    const commentTextControl = document.createElement('div');
+    commentTextControl.className = 'control';
+    commentText.appendChild(commentTextControl);
+
+    const commentTextInput = document.createElement('input');
+    commentTextInput.className = 'input';
+    commentTextInput.setAttribute('type', 'text');
+    commentTextInput.setAttribute('placeholder', 'comment');
+    commentTextControl.appendChild(commentTextInput);
+
+    const commentModalFooter = document.createElement('footer');
+    commentModalFooter.className = 'modal-card-foot';
+    commentModalCard.appendChild(commentModalFooter);
+
+    const commentSubmitButton = document.createElement('button');
+    commentSubmitButton.className = 'button';
+    commentSubmitButton.appendChild(document.createTextNode('Submit'));
+    commentModalFooter.appendChild(commentSubmitButton);
+
+    const commentCancelButton = document.createElement('button');
+    commentCancelButton.className = 'button is-light';
+    commentCancelButton.appendChild(document.createTextNode('Cancel'));
+    commentModalFooter.appendChild(commentCancelButton);
 
     // show comments modal
     const showCommentsModal = document.createElement('modal');
@@ -341,6 +447,81 @@ const renderFeedTemplate = (apiUrl, posts) => {
     showUpvotesModalFooter.appendChild(showUpvotesCancelButton);
     
     // event listeners
+
+    author.addEventListener('click', () => {
+      authorModal.classList.add('is-active');
+      root.classList.add('is-clipped');
+      if (!authorModalSection.firstChild) {
+        const token = localStorage.getItem('token');
+        const options = {
+          headers: {
+            'Content-Type': 'authorization/json',
+            'Authorization': `Token ${token}`
+          }
+        }
+        fetch(`${apiUrl}/user?username=${posts[i].meta.author}`, options)
+        .then(response => response.json())
+        .then(user => {
+          const authorUsernameTitle = document.createElement('div');
+          authorUsernameTitle.className = 'has-text-weight-bold';
+          authorUsernameTitle.appendChild(document.createTextNode('Username'));
+          authorModalSection.appendChild(authorUsernameTitle);
+
+          const authorUsername = document.createElement('div');
+          authorUsername.appendChild(document.createTextNode(user.username));
+          authorModalSection.appendChild(authorUsername);
+
+          const authorEmailTitle = document.createElement('div');
+          authorEmailTitle.className = 'has-text-weight-bold';
+          authorEmailTitle.appendChild(document.createTextNode('Email'));
+          authorModalSection.appendChild(authorEmailTitle);
+
+          const authorEmail = document.createElement('div');
+          authorEmail.appendChild(document.createTextNode(user.email));
+          authorModalSection.appendChild(authorEmail);
+
+          const authorNameTitle = document.createElement('div');
+          authorNameTitle.className = 'has-text-weight-bold';
+          authorNameTitle.appendChild(document.createTextNode('Name'));
+          authorModalSection.appendChild(authorNameTitle);
+
+          const authorName = document.createElement('div');
+          authorName.appendChild(document.createTextNode(user.name));
+          authorModalSection.appendChild(authorName);
+
+          const authorPostsTitle = document.createElement('div');
+          authorPostsTitle.className = 'has-text-weight-bold';
+          authorPostsTitle.appendChild(document.createTextNode('Posts'));
+          authorModalSection.appendChild(authorPostsTitle);
+
+          for (let j = 0; j < user.posts.length; j++) {
+            fetch(`${apiUrl}/post?id=${user.posts[j]}`, options)
+            .then(response => response.json())
+            .then(post => {
+              const authorPostTitle = document.createElement('div');
+              authorPostTitle.className = 'has-text-weight-bold';
+              authorPostTitle.appendChild(document.createTextNode(post.title));
+              authorModalSection.appendChild(authorPostTitle);
+
+              const authorPostText = document.createElement('div');
+              authorPostText.appendChild(document.createTextNode(post.text));
+              authorModalSection.appendChild(authorPostText);
+            })
+          }
+
+        })
+      }
+    });
+
+    authorModalBackground.addEventListener('click', () => {
+      authorModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    })
+
+    authorCancelButton.addEventListener('click', () => {
+      authorModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    })
     
     upvote.addEventListener('click', () => {
       const token = localStorage.getItem('token');
@@ -351,33 +532,57 @@ const renderFeedTemplate = (apiUrl, posts) => {
           'Authorization': `Token ${token}`
         }
       }
-      fetch(`${apiUrl}/post/vote?id=${posts[i].id}`, options)
-      .then(response => response.json())
-      .then(response => {
-        if (response.status == 200) {
-          upvote.removeChild(upvote.firstChild);
-          upvote.appendChild(document.createTextNode('Remove Upvote'));
-        }
-      })
+      fetch(`${apiUrl}/post/vote?id=${posts[i].id}`, options);
     });
 
     removeUpvote.addEventListener('click', () => {
       const token = localStorage.getItem('token');
       const options = {
-        method: 'Delete',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Token ${token}`
         }
       }
-      fetch(`${apiUrl}/post/vote?id=${posts[i].id}`, options)
-      .then(response => response.json())
-      .then(response => {
-        if (response.status == 200) {
-          upvote.removeChild(upvote.firstChild);
-          upvote.appendChild(document.createTextNode('Upvote'));
+      fetch(`${apiUrl}/post/vote?id=${posts[i].id}`, options);
+    });
+
+    comment.addEventListener('click', () => {
+      commentModal.classList.add('is-active');
+      root.classList.add('is-clipped');
+    });
+
+    commentModalBackground.addEventListener('click', () => {
+      commentModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    });
+
+    commentCancelButton.addEventListener('click', () => {
+      commentModal.classList.remove('is-active');
+      root.classList.remove('is-clipped');
+    });
+
+    commentSubmitButton.addEventListener('click', () => {
+      const comment = commentTextInput.value;
+      if (comment) {
+        commentSubmitButton.classList.add('is-loading');
+        const token = localStorage.getItem('token');
+        const payload = {
+          'comment': comment
         }
-      })
+        const options = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          },
+          body: JSON.stringify(payload)
+        }
+        fetch(`${apiUrl}/post/comment?id=${posts[i].id}`, options);
+        commentSubmitButton.classList.remove('is-loading');
+        commentModal.classList.remove('is-active');
+        root.classList.remove('is-clipped');
+      }
     });
 
     showComments.addEventListener('click', () => {
