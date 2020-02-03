@@ -17,13 +17,15 @@
             <a tag="router-link" @click="sub">
               s/{{ post.meta.subseddit }}
             </a>
+            <br />
+            {{ post.meta.published }}
           </p>
         </div>
       </div>
       <div class="content">
         {{ post.text }}
         <br />
-        <p class="has-text-weight-semibold">{{ post.meta.published}}</p>
+
         <a tag="router-link" @click="comments">
           show comments
         </a>

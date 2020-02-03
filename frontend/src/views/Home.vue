@@ -12,13 +12,21 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 export default {
   name: 'home',
   computed: {
-      ...mapGetters([
-          'getApi',
-          'getPosts'
-      ])
+    ...mapGetters([
+      'getPosts'
+    ])
+  },
+  methods: {
+    ...mapActions([
+      'post_public'
+    ]),
+  },
+  mounted() {
+    this.post_public();
   }
 }
 </script>

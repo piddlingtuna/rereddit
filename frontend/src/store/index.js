@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios';
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    api: '127.0.0.1:5000',
-    id: 1,
+    api: 'http://127.0.0.1:5000',
     about: [
       {
         title: 'Author',
@@ -22,132 +22,19 @@ export default new Vuex.Store({
         content: 'michaelgribbeninfo@gmail.com'
       }
     ],
-    users: [
-      {
-        "username": "baz",
-        "name": "Barry",
-        "id"  : 1,
-        "posts": [1]
-      },
-      {
-        "username": "a_cop",
-        "name": "Not a cop",
-        "id"  : 2,
-        "posts": [2]
-      },
-      {
-        "username": "bad_boy",
-        "name": "Good Boy",
-        "id"  : 3,
-        "posts": [3]
-      }
-    ],
-    posts: [
-      {
-        "id": 141,
-        "text": "Philosophy is a battle against the bewitchment of our intelligence by means of language",
-        "title": "Philosophy is",
-        "meta": {
-            "author": "Sandra",
-            "subseddit": "shower-thoughts",
-            "published": "1551568707",
-            "upvotes": [
-                3,
-                106,
-                173,
-                142,
-                48,
-                176,
-                18,
-                20,
-                85,
-                149,
-                151,
-                181,
-                87,
-                26,
-                117,
-                124,
-                157,
-                190
-            ]
-        },
-        "thumbnail": null,
-        "image": null,
-        "comments": [
-            {
-                "author": "Theresa",
-                "published": "1557845057",
-                "comment": "I love this shot!"
-            },
-            {
-                "author": "Jose",
-                "published": "1558163297",
-                "comment": "are you kidding me? unfollowed"
-            },
-            {
-                "author": "Teresa",
-                "published": "1556249333",
-                "comment": "i agree! why are more people not saying this"
-            }
-        ]
-      }, {
-        "id": 142,
-        "text": "Philosophy is nothing compared to Philosophy",
-        "title": "Number 2",
-        "meta": {
-            "author": "Sandra",
-            "subseddit": "shower-thoughts",
-            "published": "1551568707",
-            "upvotes": [
-                3,
-                106,
-                173,
-                142,
-                48,
-                176,
-                18,
-                20,
-                85,
-                149,
-                151,
-                181,
-                87,
-                26,
-                117,
-                124,
-                157,
-                190
-            ]
-        },
-        "thumbnail": null,
-        "image": null,
-        "comments": [
-            {
-                "author": "Theresa",
-                "published": "1557845057",
-                "comment": "I love this shot!"
-            },
-            {
-                "author": "Jose",
-                "published": "1558163297",
-                "comment": "are you kidding me? unfollowed"
-            },
-            {
-                "author": "Teresa",
-                "published": "1556249333",
-                "comment": "i agree! why are more people not saying this"
-            }
-        ]
-      }
-    ]
+    token: null,
+    token_pending: null,
+    token_status: null,
+    users: [],
+    users_pending: null,
+    users_status: null,
+    posts: [],
+    posts_pending: null,
+    posts_status: null,
   },
   getters: {
-    getApi: (state) => {
-      return state.api;
-    },
-    getId: (state) => {
-      return state.id;
+    getToken: (state) => {
+      return state.token;
     },
     getAbout: (state) => {
       return state.about
@@ -173,9 +60,120 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    add_posts: (state, payload) => {
+      payload.posts.forEach((post) => {
+        state.posts.push(post);
+      })
+    },
+    clear_posts: (state) => {
+      state.posts.splice(0, state.posts.length);
+    },
+    set_posts_pending: (state, payload) => {
+      Vue.set(state, 'posts_pending', payload);
+    },
+    set_posts_status: (state, payload) => {
+      Vue.set(state, 'posts_status', payload);
+    },
+    set_token: (state, payload) => {
+      Vue.set(state, 'token', payload);
+    },
+    set_token_pending: (state, payload) => {
+      Vue.set(state, 'token_pending', payload);
+    },
+    set_token_status: (state, payload) => {
+      Vue.set(state, 'token_status', payload);
+    }
   },
   actions: {
-    
+    post_public: (context) => {
+      context.commit('set_posts_pending', true);
+      const options = {
+        'url': `${context.state.api}/post/public`,
+        'method': 'GET',
+        'headers': {
+          'Content-Type': 'application/json',
+        }
+      }
+      axios(options)
+      .then((response) => {
+        context.commit('add_posts', response.data)
+        context.commit('set_token_status', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('set_posts_status', false);
+      })
+      .finally(() => {
+        context.commit('set_posts_pending', false);
+      })
+    },
+    auth_login: (context, { username, password }) => {
+      context.commit('set_token_pending', true);
+      context.commit('set_token', null);
+      const options = {
+        'url': `${context.state.api}/auth/login`,
+        'method': 'POST',
+        'headers': {
+          'Content-Type': 'application/json',
+        },
+        'data': {
+          username: username,
+          password: password
+        }
+      }
+      axios(options)
+      .then((response) => {
+        context.commit('set_token', response.data.token);
+        context.commit('set_token_status', true);
+        context.commit('clear_posts');
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('set_token', null);
+        context.commit('set_token_status', false);
+      })
+      .finally(() => {
+        context.commit('set_token_pending', false);
+      })
+    },
+    auth_logout: (context) => {
+      context.commit('set_token', null);
+      context.commit('set_token_status', true);
+      context.commit('set_token_pending', false);
+      context.commit('clear_posts');
+      context.dispatch('post_public');
+    },
+    auth_signup: (context, { username, password, email, name }) => {
+      context.commit('set_token_pending', true);
+      context.commit('set_token', null);
+      const options = {
+        'url': `${context.state.api}/auth/signup`,
+        'method': 'POST',
+        'headers': {
+          'Content-Type': 'application/json',
+        },
+        'data': {
+          username: username,
+          password: password,
+          email: email,
+          name: name
+        }
+      }
+      axios(options)
+      .then((response) => {
+        context.commit('set_token', response.data.token);
+        context.commit('set_token_status', true);
+        context.commit('clear_posts');
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('set_token', null);
+        context.commit('set_token_status', false);
+      })
+      .finally(() => {
+        context.commit('set_token_pending', false);
+      })
+    }
   },
   modules: {
   }
