@@ -23,14 +23,14 @@ export default new Vuex.Store({
       }
     ],
     token: null,
-    token_pending: null,
-    token_status: null,
+    tokenPending: null,
+    tokenStatus: null,
     users: [],
-    users_pending: null,
-    users_status: null,
+    usersPending: null,
+    usersStatus: null,
     posts: [],
-    posts_pending: null,
-    posts_status: null,
+    postsPending: null,
+    postsStatus: null,
   },
   getters: {
     getToken: (state) => {
@@ -60,33 +60,33 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    add_posts: (state, payload) => {
+    addPosts: (state, payload) => {
       payload.posts.forEach((post) => {
         state.posts.push(post);
       })
     },
-    clear_posts: (state) => {
+    clearPosts: (state) => {
       state.posts.splice(0, state.posts.length);
     },
-    set_posts_pending: (state, payload) => {
-      Vue.set(state, 'posts_pending', payload);
+    setPostsPending: (state, payload) => {
+      Vue.set(state, 'postsPending', payload);
     },
-    set_posts_status: (state, payload) => {
-      Vue.set(state, 'posts_status', payload);
+    setPostsStatus: (state, payload) => {
+      Vue.set(state, 'postsStatus', payload);
     },
-    set_token: (state, payload) => {
+    setToken: (state, payload) => {
       Vue.set(state, 'token', payload);
     },
-    set_token_pending: (state, payload) => {
-      Vue.set(state, 'token_pending', payload);
+    setTokenPending: (state, payload) => {
+      Vue.set(state, 'tokenPending', payload);
     },
-    set_token_status: (state, payload) => {
-      Vue.set(state, 'token_status', payload);
+    setTokenStatus: (state, payload) => {
+      Vue.set(state, 'tokenStatus', payload);
     }
   },
   actions: {
-    post_public: (context) => {
-      context.commit('set_posts_pending', true);
+    postPublic: (context) => {
+      context.commit('setPostsPending', true);
       const options = {
         'url': `${context.state.api}/post/public`,
         'method': 'GET',
@@ -96,20 +96,20 @@ export default new Vuex.Store({
       }
       axios(options)
       .then((response) => {
-        context.commit('add_posts', response.data)
-        context.commit('set_token_status', true);
+        context.commit('addPosts', response.data)
+        context.commit('setTokenStatus', true);
       })
       .catch((error) => {
         console.log(error);
-        context.commit('set_posts_status', false);
+        context.commit('setPostsStatus', false);
       })
       .finally(() => {
-        context.commit('set_posts_pending', false);
+        context.commit('setPostsPending', false);
       })
     },
-    auth_login: (context, { username, password }) => {
-      context.commit('set_token_pending', true);
-      context.commit('set_token', null);
+    authLogin: (context, { username, password }) => {
+      context.commit('setTokenPending', true);
+      context.commit('setToken', null);
       const options = {
         'url': `${context.state.api}/auth/login`,
         'method': 'POST',
@@ -123,29 +123,29 @@ export default new Vuex.Store({
       }
       axios(options)
       .then((response) => {
-        context.commit('set_token', response.data.token);
-        context.commit('set_token_status', true);
-        context.commit('clear_posts');
+        context.commit('setToken', response.data.token);
+        context.commit('setTokenStatus', true);
+        context.commit('clearPosts');
       })
       .catch((error) => {
         console.log(error);
-        context.commit('set_token', null);
-        context.commit('set_token_status', false);
+        context.commit('setToken', null);
+        context.commit('setTokenStatus', false);
       })
       .finally(() => {
-        context.commit('set_token_pending', false);
+        context.commit('setTokenPending', false);
       })
     },
-    auth_logout: (context) => {
-      context.commit('set_token', null);
-      context.commit('set_token_status', true);
-      context.commit('set_token_pending', false);
-      context.commit('clear_posts');
-      context.dispatch('post_public');
+    authLogout: (context) => {
+      context.commit('setToken', null);
+      context.commit('setTokenStatus', true);
+      context.commit('setTokenPending', false);
+      context.commit('clearPosts');
+      context.dispatch('postPublic');
     },
-    auth_signup: (context, { username, password, email, name }) => {
-      context.commit('set_token_pending', true);
-      context.commit('set_token', null);
+    authSignup: (context, { username, password, email, name }) => {
+      context.commit('setTokenPending', true);
+      context.commit('setToken', null);
       const options = {
         'url': `${context.state.api}/auth/signup`,
         'method': 'POST',
@@ -161,17 +161,17 @@ export default new Vuex.Store({
       }
       axios(options)
       .then((response) => {
-        context.commit('set_token', response.data.token);
-        context.commit('set_token_status', true);
-        context.commit('clear_posts');
+        context.commit('setToken', response.data.token);
+        context.commit('setTokenStatus', true);
+        context.commit('clearPosts');
       })
       .catch((error) => {
         console.log(error);
-        context.commit('set_token', null);
-        context.commit('set_token_status', false);
+        context.commit('setToken', null);
+        context.commit('setTokenStatus', false);
       })
       .finally(() => {
-        context.commit('set_token_pending', false);
+        context.commit('setTokenPending', false);
       })
     }
   },
