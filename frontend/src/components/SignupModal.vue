@@ -45,7 +45,7 @@
       <footer class="modal-card-foot">
         <button class="button is-success"
           v-if="username && password && email && name"
-          @click="[auth_signup({ username: username, password: password, email: email, name: name }), $parent.close()]"
+          @click="[authSignup({ username: username, password: password, email: email, name: name }), $parent.close()]"
         >
           Signup
         </button>
@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'auth_signup'
+      'authSignup'
     ]),
   }
 }

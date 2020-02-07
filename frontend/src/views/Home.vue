@@ -22,11 +22,24 @@ export default {
   },
   methods: {
     ...mapActions([
-      'post_public'
+      'postPublic',
+      'userFeed'
     ]),
+    infinite() {
+      console.log('hi');
+      if(window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        this.userFeed();
+      }
+    }
   },
   mounted() {
-    this.post_public();
+    this.postPublic();
+  },
+  create() {
+    window.addEventListener('scroll', this.infinite);
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.infinite);
   }
 }
 </script>

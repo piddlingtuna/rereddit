@@ -7,6 +7,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     api: 'http://127.0.0.1:5000',
+    p: 0,
+    n: 20,
     about: [
       {
         title: 'Author',
@@ -60,6 +62,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    incP: (state, payload) => {
+      Vue.set(state, 'state.p', state.p + payload);
+    },
     addPosts: (state, payload) => {
       payload.posts.forEach((post) => {
         state.posts.push(post);
@@ -82,15 +87,24 @@ export default new Vuex.Store({
     },
     setTokenStatus: (state, payload) => {
       Vue.set(state, 'tokenStatus', payload);
+    },
+    addUser: (state, payload) => {
+      state.users.push(payload);
+    },
+    setUsersPending: (state, payload) => {
+      Vue.set(state, 'usersPending', payload);
+    },
+    setUsersStatus: (state, payload) => {
+      Vue.set(state, 'usersStatus', payload);
     }
   },
   actions: {
     postPublic: (context) => {
       context.commit('setPostsPending', true);
       const options = {
-        'url': `${context.state.api}/post/public`,
-        'method': 'GET',
-        'headers': {
+        url: `${context.state.api}/post/public`,
+        method: 'GET',
+        headers: {
           'Content-Type': 'application/json',
         }
       }
@@ -111,9 +125,9 @@ export default new Vuex.Store({
       context.commit('setTokenPending', true);
       context.commit('setToken', null);
       const options = {
-        'url': `${context.state.api}/auth/login`,
-        'method': 'POST',
-        'headers': {
+        url: `${context.state.api}/auth/login`,
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
         },
         'data': {
@@ -126,6 +140,7 @@ export default new Vuex.Store({
         context.commit('setToken', response.data.token);
         context.commit('setTokenStatus', true);
         context.commit('clearPosts');
+        context.dispatch('userFeed');
       })
       .catch((error) => {
         console.log(error);
@@ -147,9 +162,9 @@ export default new Vuex.Store({
       context.commit('setTokenPending', true);
       context.commit('setToken', null);
       const options = {
-        'url': `${context.state.api}/auth/signup`,
-        'method': 'POST',
-        'headers': {
+        url: `${context.state.api}/auth/signup`,
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
         },
         'data': {
@@ -172,6 +187,56 @@ export default new Vuex.Store({
       })
       .finally(() => {
         context.commit('setTokenPending', false);
+      })
+    },
+    user: (context, { username }) => {
+      if (!(username in this.users)) {
+        context.commit('setUsersPending', true);
+        const options = {
+          url: `${context.state.api}/user?username=${username}`,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${context.state.token}`
+          }
+        }
+        axios(options)
+        .then((response) => {
+          context.commit('addUser', response.data);
+          context.commit('setUsersStatus', true);
+        })
+        .catch((error) => {
+          console.log(error);
+          context.commit('setUsersStatus', false);
+        })
+        .finally(() => {
+          context.commit('setUsersPending', false);
+        })
+      }
+    },
+    userFeed: (context) => {
+      context.commit('setPostsPending', true);
+      const options = {
+        url: `${context.state.api}/user/feed?p=${context.state.p}&n=${context.state.n}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`,
+        }
+      }
+      axios(options)
+      .then((response) => {
+        context.commit('setPostsStatus', true);
+        context.commit('addPosts', response.data);
+        context.commit('incP', response.data.posts.length);
+
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setPostsStatus', false);
+      })
+      .finally(() => {
+        context.commit('setPostsPending', false);
       })
     }
   },

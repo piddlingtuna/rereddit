@@ -10,22 +10,27 @@
         <div class="media-content">
           <p class="title is-4">{{ post.title }}</p>
           <p class="subtitle is-6">
-            <a tag="router-link" @click="user">
+            <a v-if="getToken" tag="router-link" @click="author">
               u/{{ post.meta.author }}
             </a>
-            <br />
-            <a tag="router-link" @click="sub">
+            <a v-else>
+              u/{{ post.meta.author }}
+            </a>
+            |
+            <a v-if="getToken" tag="router-link" @click="sub">
+              s/{{ post.meta.subseddit }}
+            </a>
+            <a v-else>
               s/{{ post.meta.subseddit }}
             </a>
             <br />
-            {{ post.meta.published }}
+            {{ pubDate(post.meta.published) }}
           </p>
         </div>
       </div>
       <div class="content">
         {{ post.text }}
         <br />
-
         <a tag="router-link" @click="comments">
           show comments
         </a>
@@ -39,13 +44,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
   name: 'post',
   props: {
     post: Object
   },
+  computed: {
+    ...mapGetters([
+      'getToken'
+    ])
+  },
   methods: {
-    user() {
+    author() {
       this.$router.push({ path: `/u/${this.$props.post.meta.author}` });
     },
     sub() {
@@ -57,3 +68,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+a {
+  text-decoration: none;
+}
+</style>

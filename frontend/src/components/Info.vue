@@ -1,6 +1,6 @@
 <template>
   <div class="info">
-    <div class="hero is-white">
+    <div class="hero is-info">
       <div class="hero-body">
         <div class="container">
           <h1 class="title">

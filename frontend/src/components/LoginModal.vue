@@ -27,7 +27,7 @@
       <footer class="modal-card-foot">
         <button class="button is-success"
           v-if="username && password"
-          @click="[auth_login({ username: username, password: password }), $parent.close()]"
+          @click="[authLogin({ username: username, password: password }), $parent.close()]"
         >
           Login
         </button>
@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'auth_login'
+      'authLogin'
     ]),
   }
 }

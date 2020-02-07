@@ -18,7 +18,7 @@ export default {
   name: 'loginModal',
   methods: {
     ...mapActions([
-        'auth_logout'
+        'authLogout'
     ])
   }
 }

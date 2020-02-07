@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar transparent>
+    <b-navbar class="is-info">
       <template slot="brand">
         <b-navbar-item tag="router-link" to="/">
           <img
@@ -11,27 +11,27 @@
       </template>
       <template slot="start">
         <b-navbar-item tag="div">
-          <b-field type="is-success">
+          <b-field type="is-info">
             <b-input placeholder="search" type="search" expanded></b-input>
             <p class="control">
-              <b-button class="button is-success">Search</b-button>
+              <b-button class="button is-info">Search</b-button>
             </p>
           </b-field>
         </b-navbar-item>
         <b-navbar-item tag="div">
           <div v-if="getToken" class="buttons">
-            <a class="button is-warning">
+            <a class="button is-white">
               Profile
             </a>
-            <a class="button is-danger" @click="LogoutModal = true">
+            <a class="button is-white" @click="LogoutModal = true">
               Log out
             </a>
           </div>
           <div v-else class="buttons">
-            <a class="button is-warning" @click="SignupModal = true">
+            <a class="button is-white" @click="SignupModal = true">
               Sign up
             </a>
-            <a class="button is-danger" @click="LoginModal = true">
+            <a class="button is-white" @click="LoginModal = true">
               Log in
             </a>
           </div>
