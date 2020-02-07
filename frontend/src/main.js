@@ -15,6 +15,7 @@ import SignupModal from '@/components/SignupModal.vue';
 import LoginModal from '@/components/LoginModal.vue';
 import LogoutModal from '@/components/LogoutModal.vue';
 import Post from '@/components/Post.vue';
+import Comment from '@/components/Comment.vue';
 import Info from '@/components/Info.vue';
 
 Vue.component('Navbar', Navbar);
@@ -22,6 +23,7 @@ Vue.component('SignupModal', SignupModal);
 Vue.component('LoginModal', LoginModal);
 Vue.component('LogoutModal', LogoutModal);
 Vue.component('Post', Post);
+Vue.component('Comment', Comment);
 Vue.component('Info', Info);
 
 Vue.mixin({

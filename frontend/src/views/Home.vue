@@ -1,45 +1,143 @@
 <template>
   <div class="home">
     <div class="container">
-      <Post
-        v-for="post in getPosts"
-        :post="post"
-        :key="post.id"
-      />
+      <div v-if="getToken">
+        <Post
+          v-for="post in this.feed"
+          :key="post.id"
+          :post="post"
+        />
+      </div>
+      <div v-else>
+        <Post
+          v-for="post in this.public"
+          :key="post.id"
+          :post="post"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { mapActions } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
+import axios from 'axios';
 export default {
   name: 'home',
+  data() {
+    return {
+      feed: [],
+      public: [],
+      pending: null,
+      status: null,
+      p: 0,
+      n: 20
+    }
+  },
   computed: {
     ...mapGetters([
-      'getPosts'
+      'getToken',
+      'getApi'
     ])
   },
   methods: {
-    ...mapActions([
-      'postPublic',
-      'userFeed'
+    ...mapMutations([
+      'setProfile'
     ]),
-    infinite() {
-      console.log('hi');
-      if(window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-        this.userFeed();
+    getPublic() {
+      const options = {
+        url: `${this.getApi}/post/public`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.public = response.data.posts;
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    getFeed() {
+      const options = {
+        url: `${this.getApi}/user/feed?p=${this.p}&n=${this.n}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        response.data.posts.forEach((post) => {
+          this.feed.push(post);
+        });
+        this.p += response.data.posts.length
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    getProfile() {
+      const options = {
+        url: `${this.getApi}/user`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.setProfile(response.data);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    handleScroll() {
+      if(this.getToken && (window.innerHeight + window.scrollY >= document.body.offsetHeight)) {
+        this.getFeed();
       }
     }
   },
-  mounted() {
-    this.postPublic();
+  watch: {
+    getToken(value) {
+      if (value) {
+        this.getFeed();
+        this.getProfile();
+      }
+    }
   },
-  create() {
-    window.addEventListener('scroll', this.infinite);
+  created() {
+    this.getPublic();
+    window.addEventListener('scroll', this.handleScroll);
   },
   destroyed() {
-    window.removeEventListener('scroll', this.infinite);
-  }
+    window.removeEventListener('scroll', this.handleScroll);
+  },
 }
 </script>

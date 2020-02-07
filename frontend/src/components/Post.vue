@@ -31,13 +31,15 @@
       <div class="content">
         {{ post.text }}
         <br />
-        <a tag="router-link" @click="comments">
-          show comments
-        </a>
-        |
-        <a tag="router-link">
-          add comment
-        </a>
+        <div v-if="getToken">
+          <a tag="router-link" @click="comments">
+            show comments
+          </a>
+          |
+          <a tag="router-link">
+            add comment
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -52,7 +54,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getToken'
+      'getToken',
     ])
   },
   methods: {
@@ -65,12 +67,6 @@ export default {
     comments() {
       this.$router.push({ path: `/p/${this.$props.post.id}` });
     }
-  }
+  },
 }
 </script>
-
-<style scoped>
-a {
-  text-decoration: none;
-}
-</style>

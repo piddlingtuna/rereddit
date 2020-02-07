@@ -18,43 +18,119 @@
         </div>
       </div>
     </div>
-    <Post class="container"
-      v-for="post in userContent.posts"
-      :key="post"
-      :post="postContent(post)"
+    <Post
+      v-for="post in posts"
+      :key="post.id"
+      :post="post"
     />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import { mapActions } from 'vuex';
+import axios from 'axios';
 export default {
   name: 'userPage',
   props: {
-    username: String,
+    username: String
+  },
+  data() {
+    return {
+      user: null,
+      posts: [],
+      following: [],
+      pending: null,
+      status: null
+    }
   },
   computed: {
     ...mapGetters([
-        'getUser',
-        'getPost',
-        'getUsers'
-    ]),
-    userContent() {
-      this.user(this.$props.username);
-      console.log(this.getUsers);
-      console.log(this.$props.username);
-      console.log(this.getUser(this.$props.username))
-      return this.getUser(this.$props.username);
-    }
+        'getToken',
+        'getApi'
+    ])
   },
   methods: {
-    ...mapActions([
-      'user'
-    ]),
-    postContent(id) {
-      return this.getPost(id);
+    getUser() {
+      const options = {
+        url: `${this.getApi}/user?username=${this.username}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.user = response.data;
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    getPost(id) {
+      const options = {
+        url: `${this.getApi}/post?id=${id}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.posts.push(response.data);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    getFollowing(id) {
+      const options = {
+        url: `${this.getApi}/user?id=${id}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.following.push(response.data);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
     }
+  },
+  created() {
+    this.getUser();
+    this.user.posts.forEach((post) => {
+      this.getPost(post);
+    });
+    this.user.following.forEach((user) => {
+      this.getFollowing(user);
+    });
   }
 }
 </script>

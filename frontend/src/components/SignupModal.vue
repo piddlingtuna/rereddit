@@ -45,7 +45,7 @@
       <footer class="modal-card-foot">
         <button class="button is-success"
           v-if="username && password && email && name"
-          @click="[authSignup({ username: username, password: password, email: email, name: name }), $parent.close()]"
+          @click="[signup(), $parent.close()]"
         >
           Signup
         </button>
@@ -64,7 +64,8 @@
 
 
 <script>
-import { mapActions } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
+import axios from 'axios';
 export default {
   name: 'signupModal',
   data() {
@@ -72,13 +73,49 @@ export default {
       username: '',
       password: '',
       email: '',
-      name: ''
+      name: '',
+      pending: null,
+      status: null
     }
   },
+  computed: {
+    ...mapGetters([
+      'getApi'
+    ])
+  },
   methods: {
-    ...mapActions([
-      'authSignup'
+    ...mapMutations([
+      'setToken'
     ]),
+    signup() {
+      const options = {
+        url: `${this.getApi}/auth/signup`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          username: this.username,
+          password: this.password,
+          email: this.email,
+          name: this.name
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.setToken(response.data.token);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    }
   }
 }
 </script>

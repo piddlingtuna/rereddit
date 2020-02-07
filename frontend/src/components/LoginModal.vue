@@ -27,7 +27,7 @@
       <footer class="modal-card-foot">
         <button class="button is-success"
           v-if="username && password"
-          @click="[authLogin({ username: username, password: password }), $parent.close()]"
+          @click="[login(), $parent.close()]"
         >
           Login
         </button>
@@ -45,19 +45,54 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
+import axios from 'axios';
 export default {
   name: 'loginModal',
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      pending: null,
+      status: null
     }
   },
+  computed: {
+    ...mapGetters([
+      'getApi'
+    ])
+  },
   methods: {
-    ...mapActions([
-      'authLogin'
+    ...mapMutations([
+      'setToken'
     ]),
+    login() {
+      const options = {
+        url: `${this.getApi}/auth/login`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          username: this.username,
+          password: this.password
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.setToken(response.data.token);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    }
   }
 }
 </script>

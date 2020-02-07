@@ -4,7 +4,7 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
-            {{ post.meta }}
+            {{ post.title }}
           </h1>
           <h2 class="subtitle is-6">
             <a v-if="getToken" tag="router-link" @click="author">
@@ -29,61 +29,69 @@
         </div>
       </div>
     </div>
-    <div class="container"
+    <Comment
       v-for="comment in post.comments"
       :key="comment.id"
-    >
-      <div class="card">
-        <div class="card-content">
-            <p class="title is-6">
-              <a v-if="token" tag="router-link" @click="commentAuthor(comment.author)">
-                u/{{ comment.author }}
-              </a>
-              <a>
-                u/{{ comment.author }}
-              </a>
-            </p>
-          <div class="content">
-            {{ comment.comment }}
-            <br />
-            {{ pubDate(comment.published) }}
-          </div>
-        </div>
-      </div>
-    </div>
+      :comment="comment"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import { mapActions } from 'vuex';
+import axios from 'axios';
 export default {
   name: 'postPage',
   props: {
     id: String
   },
+  data() {
+    return {
+      post: null,
+      pending: null,
+      status: null
+    }
+  },
   computed: {
     ...mapGetters([
       'getToken',
-      'getUser'
-    ]),
-    post() {
-      return this.getPost(this.$props.id);
-    }
+      'getApi'
+    ])
   },
   methods: {
-    ...mapActions([
-      'userFeed'
-    ]),
+    getPost() {
+      const options = {
+        url: `${this.getApi}/post?id=${this.id}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        },
+      }
+      this.pending = true;
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        this.post = response.data
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
     author() {
       this.$router.push({ path: `/u/${this.post.meta.author}` });
     },
     sub() {
       this.$router.push({ path: `/s/${this.post.meta.subseddit}` });
-    },
-    commentAuthor(author) {
-      this.$router.push({ path: `/u/${author}` });
-    },
+    }
+  },
+  created() {
+    this.getPost()
   }
 }
 </script>
