@@ -79,7 +79,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.post = response.data
         this.status = true;
       })

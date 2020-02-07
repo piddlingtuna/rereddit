@@ -7,9 +7,14 @@
             <h1 class="title">
               {{ user.username }}      
               <div class="button is-white"
-                v-if="user.username != getProfile.username"
+                v-if="(user.username != getProfile.username) && !getProfile.following.includes(user.id)"
               >
                 Follow
+              </div>
+              <div class="button is-white"
+                v-if="(user.username != getProfile.username) && getProfile.following.includes(user.id)"
+              >
+                Unfollow
               </div>
               <div class="button is-white"
                 @click="followingModal = true"
@@ -54,7 +59,7 @@
       has-modal-card
       trap-focus
     >
-      <FollowingModal />
+      <FollowingModal :following="following" />
     </b-modal>
   </div>
 </template>
@@ -97,7 +102,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.user = response.data;
         this.user.posts.forEach((post) => {
           this.getPost(post);
@@ -127,7 +131,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.posts.push(response.data);
       })
       .catch((error) => {
@@ -147,7 +150,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.following.push(response.data);
       })
       .catch((error) => {
@@ -157,7 +159,7 @@ export default {
     }
   },
   created() {
-    this.getUser()
+    this.getUser();
   }
 }
 </script>

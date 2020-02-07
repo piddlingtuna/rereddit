@@ -63,7 +63,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.public = response.data.posts;
         this.status = true;
       })
@@ -87,7 +86,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         response.data.posts.forEach((post) => {
           this.feed.push(post);
         });
@@ -114,7 +112,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.setProfile(response.data);
         this.status = true;
       })
