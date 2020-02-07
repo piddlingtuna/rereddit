@@ -12,8 +12,11 @@ export default new Vuex.Store({
         title: 'Author',
         content: 'Michael Gribben'
       }, {
-        title: 'Tech',
+        title: 'Frontend',
         content: 'Javascript, Vue.js, Vue.js Router, Vuex, Buefy'
+      }, {
+        title: 'Backend',
+        content: 'Python, Flask'
       }
     ],
     contact: [

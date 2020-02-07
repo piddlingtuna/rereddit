@@ -46,27 +46,27 @@
           </b-navbar-item>
       </template>
     </b-navbar>
-      <b-modal
-        :active.sync="SignupModal"
-        has-modal-card
-        trap-focus
-      >
-        <SignupModal />
-      </b-modal>
-      <b-modal
-        :active.sync="LoginModal"
-        has-modal-card
-        trap-focus
-      >
-        <LoginModal />
-      </b-modal>
-      <b-modal
-        :active.sync="LogoutModal"
-        has-modal-card
-        trap-focus
-      >
-        <LogoutModal />
-      </b-modal>
+    <b-modal
+      :active.sync="SignupModal"
+      has-modal-card
+      trap-focus
+    >
+      <SignupModal />
+    </b-modal>
+    <b-modal
+      :active.sync="LoginModal"
+      has-modal-card
+      trap-focus
+    >
+      <LoginModal />
+    </b-modal>
+    <b-modal
+      :active.sync="LogoutModal"
+      has-modal-card
+      trap-focus
+    >
+      <LogoutModal />
+    </b-modal>
   </div>
 </template>
 

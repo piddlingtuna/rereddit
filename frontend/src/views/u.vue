@@ -11,7 +11,9 @@
               >
                 Follow
               </div>
-              <div class="button is-white">
+              <div class="button is-white"
+                @click="followingModal = true"
+              >
                 See Following
               </div>
             </h1>
@@ -47,6 +49,13 @@
     <div v-else>
       An error has occurred.
     </div>
+    <b-modal
+      :active.sync="followingModal"
+      has-modal-card
+      trap-focus
+    >
+      <FollowingModal />
+    </b-modal>
   </div>
 </template>
 
@@ -64,7 +73,8 @@ export default {
       posts: [],
       following: [],
       pending: null,
-      status: null
+      status: null,
+      followingModal: false
     }
   },
   computed: {
