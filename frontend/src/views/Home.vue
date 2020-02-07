@@ -1,20 +1,28 @@
 <template>
-  <div class="home">
-    <div class="container">
-      <div v-if="getToken">
-        <Post
-          v-for="post in this.feed"
-          :key="post.id"
-          :post="post"
-        />
+  <div>
+    <div v-if="status">
+      <div class="container">
+        <div v-if="getToken">
+          <Post
+            v-for="post in this.feed"
+            :key="post.id"
+            :post="post"
+          />
+        </div>
+        <div v-else>
+          <Post
+            v-for="post in this.public"
+            :key="post.id"
+            :post="post"
+          />
+        </div>
       </div>
-      <div v-else>
-        <Post
-          v-for="post in this.public"
-          :key="post.id"
-          :post="post"
-        />
-      </div>
+    </div>
+    <div v-else-if="pending">
+      The page is loading.
+    </div>
+    <div v-else>
+      An error has occurred.
     </div>
   </div>
 </template>
@@ -129,11 +137,17 @@ export default {
       if (value) {
         this.getFeed();
         this.getProfile();
+      } else {
+        this.getProfile();
       }
     }
   },
   created() {
-    this.getPublic();
+    if (this.getToken) {
+      this.getFeed();
+    } else {
+      this.getPublic();
+    }
     window.addEventListener('scroll', this.handleScroll);
   },
   destroyed() {

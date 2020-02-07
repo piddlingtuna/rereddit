@@ -1,28 +1,52 @@
 <template>
   <div>
-    <div class="hero is-info">
-      <div class="hero-body">
-        <div class="container">
-          <h1 class="title">
-            {{ userContent.username }}
-          </h1>
-          <h2 class="is-6">
-            email: {{ userContent.email }}
-            <br />
-            name: {{ userContent.name }}
-            <br />
-            #followers: {{ userContent.following.length }}
-            <br />
-            #followed: {{ userContent.followed_num }}
-          </h2>
+    <div v-if="status">
+      <div class="hero is-info">
+        <div class="hero-body">
+          <div class="container">
+            <h1 class="title">
+              {{ user.username }}      
+              <div class="button is-white"
+                v-if="user.username != getProfile.username"
+              >
+                Follow
+              </div>
+              <div class="button is-white">
+                See Following
+              </div>
+            </h1>
+            <h2 class="is-6">
+              email: {{ user.email }}
+              <br />
+              name: {{ user.name }}
+              <br />
+              #posts: {{ user.posts.length }}
+              <br />
+              #followers: {{ user.following.length }}
+              <br />
+              #following: {{ user.followed_num }}
+            </h2>
+
+          </div>
         </div>
       </div>
+      <div v-if="posts">
+        <Post
+        v-for="post in posts"
+        :key="post.id"
+        :post="post"
+      />
+      </div>
+      <div v-else>
+        Waiting for posts.
+      </div>
     </div>
-    <Post
-      v-for="post in posts"
-      :key="post.id"
-      :post="post"
-    />
+    <div v-else-if="pending">
+      The page is loading.
+    </div>
+    <div v-else>
+      An error has occurred.
+    </div>
   </div>
 </template>
 
@@ -46,6 +70,7 @@ export default {
   computed: {
     ...mapGetters([
         'getToken',
+        'getProfile',
         'getApi'
     ])
   },
@@ -64,6 +89,12 @@ export default {
       .then((response) => {
         console.log(response);
         this.user = response.data;
+        this.user.posts.forEach((post) => {
+          this.getPost(post);
+        });
+        this.user.following.forEach((user) => {
+          this.getFollowing(user);
+        });
         this.status = true;
       })
       .catch((error) => {
@@ -88,14 +119,10 @@ export default {
       .then((response) => {
         console.log(response);
         this.posts.push(response.data);
-        this.status = true;
       })
       .catch((error) => {
         console.log(error);
         this.status = false;
-      })
-      .finally(() => {
-        this.pending = false;
       })
     },
     getFollowing(id) {
@@ -112,25 +139,21 @@ export default {
       .then((response) => {
         console.log(response);
         this.following.push(response.data);
-        this.status = true;
       })
       .catch((error) => {
         console.log(error);
         this.status = false;
       })
-      .finally(() => {
-        this.pending = false;
-      })
     }
   },
   created() {
-    this.getUser();
-    this.user.posts.forEach((post) => {
-      this.getPost(post);
-    });
-    this.user.following.forEach((user) => {
-      this.getFollowing(user);
-    });
+    this.getUser()
   }
 }
 </script>
+
+<style scoped>
+.button {
+  margin-left: 1rem;
+}
+</style>

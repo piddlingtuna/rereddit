@@ -6,7 +6,7 @@
           <a v-if="getToken" tag="router-link" @click="author(comment.author)">
             u/{{ comment.author }}
           </a>
-          <a>
+          <a v-else>
             u/{{ comment.author }}
           </a>
         </p>

@@ -20,7 +20,7 @@
         </b-navbar-item>
         <b-navbar-item tag="div">
           <div v-if="getToken" class="buttons">
-            <a class="button is-white">
+            <a class="button is-white" @click="profile">
               Profile
             </a>
             <a class="button is-white" @click="LogoutModal = true">
@@ -83,8 +83,14 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getToken'
+      'getToken',
+      'getProfile'
     ])
+  },
+  methods: {
+    profile() {
+      this.$router.push({ path: `/u/${this.getProfile.username}` });
+    }
   }
 }
 </script>

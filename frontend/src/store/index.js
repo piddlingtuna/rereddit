@@ -30,6 +30,9 @@ export default new Vuex.Store({
     getToken: (state) => {
       return state.token;
     },
+    getProfile: (state) => {
+      return state.profile;
+    },
     getAbout: (state) => {
       return state.about;
     },

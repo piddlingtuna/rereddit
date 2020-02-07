@@ -6,9 +6,6 @@
 </template>
 
 <style>
-* {
-  overflow: hidden;
-}
 a {
   color: hsl(348, 100%, 61%);
 }
