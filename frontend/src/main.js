@@ -27,7 +27,7 @@ Vue.component('Info', Info);
 Vue.mixin({
   methods: {
     pubDate: ((timestamp) => {
-      let pub = new Date(parseInt(timestamp));
+      const pub = new Date(parseInt(timestamp));
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       return `Published ${pub.getHours()}:${pub.getMinutes()} ${days[pub.getDay()]}, ${pub.getDate()} ${months[pub.getMonth()]} ${pub.getFullYear()}`;

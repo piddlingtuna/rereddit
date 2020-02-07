@@ -25,218 +25,540 @@ export default new Vuex.Store({
       }
     ],
     token: null,
-    tokenPending: null,
-    tokenStatus: null,
-    users: [],
-    usersPending: null,
-    usersStatus: null,
     posts: [],
-    postsPending: null,
-    postsStatus: null,
+    public: [],
+    users: [],
+    postPending: null,
+    postStatus: null,
+    votePending: null,
+    voteStatus: null,
+    commentPending: null,
+    commentStatus: null,
+    publicPending: null,
+    publicStatus: null,
+    authPending: null,
+    authStatus: null,
+    feedPending: null,
+    feedStatus: null,
+    profilePending: null,
+    profileStatus: null,
+    userPending: null,
+    userStatus: null,
+    followPending: null,
+    followStatus: null
   },
   getters: {
-    getToken: (state) => {
-      return state.token;
-    },
     getAbout: (state) => {
       return state.about
     },
     getContact: (state) => {
       return state.contact;
     },
-    getUsers: (state) => {
-      return state.users;
-    },
-    getUser: (state) => (username) => {
-      return state.posts.find((user) => {
-        return user.username === username;
-      });
+    getToken: (state) => {
+      return state.token;
     },
     getPosts: (state) => {
       return state.posts;
     },
-    getPost: (state) => (id) => {
+    getPublic: (state) => {
+      return state.public;
+    },
+    getUserHelper: (state) => (username) => {
+      return state.posts.find((user) => {
+        return user.username === username;
+      });
+    },
+    getPostHelper: (state) => (id) => {
       return state.posts.find((post) => {
         return post.id == id; // no type checking since param
       });
     }
   },
   mutations: {
-    incP: (state, payload) => {
-      Vue.set(state, 'state.p', state.p + payload);
-    },
-    addPosts: (state, payload) => {
-      payload.posts.forEach((post) => {
-        state.posts.push(post);
+    addPosts: (state, posts) => {
+      posts.forEach((post) => {
+        this.state.posts.push(post);
       })
     },
-    clearPosts: (state) => {
-      state.posts.splice(0, state.posts.length);
+    addUser: (state, user) => {
+      this.state.users.push(user);
     },
-    setPostsPending: (state, payload) => {
-      Vue.set(state, 'postsPending', payload);
-    },
-    setPostsStatus: (state, payload) => {
-      Vue.set(state, 'postsStatus', payload);
+    setPublic: (state, payload) => {
+      Vue.set(state, 'public', payload);
     },
     setToken: (state, payload) => {
       Vue.set(state, 'token', payload);
     },
-    setTokenPending: (state, payload) => {
-      Vue.set(state, 'tokenPending', payload);
+    setProfile: (state, payload) => {
+      Vue.set(state, 'profile', payload);
     },
-    setTokenStatus: (state, payload) => {
-      Vue.set(state, 'tokenStatus', payload);
+    setPostPending: (state, payload) => {
+      Vue.set(state, 'postPending', payload);
     },
-    addUser: (state, payload) => {
-      state.users.push(payload);
+    setPostStatus: (state, payload) => {
+      Vue.set(state, 'postStatus', payload);
     },
-    setUsersPending: (state, payload) => {
-      Vue.set(state, 'usersPending', payload);
+    setVotePending: (state, payload) => {
+      Vue.set(state, 'votePending', payload);
     },
-    setUsersStatus: (state, payload) => {
-      Vue.set(state, 'usersStatus', payload);
-    }
+    setVoteStatus: (state, payload) => {
+      Vue.set(state, 'voteStatus', payload);
+    },
+    setCommentPending: (state, payload) => {
+      Vue.set(state, 'commentPending', payload);
+    },
+    setCommentStatus: (state, payload) => {
+      Vue.set(state, 'commentStatus', payload);
+    },
+    setPublicPending: (state, payload) => {
+      Vue.set(state, 'publicPending', payload);
+    },
+    setPublicStatus: (state, payload) => {
+      Vue.set(state, 'publicStatus', payload);
+    },
+    setAuthPending: (state, payload) => {
+      Vue.set(state, 'authPending', payload);
+    },
+    setAuthStatus: (state, payload) => {
+      Vue.set(state, 'authStatus', payload);
+    },
+    setFeedPending: (state, payload) => {
+      Vue.set(state, 'feedPending', payload);
+    },
+    setFeedStatus: (state, payload) => {
+      Vue.set(state, 'feedStatus', payload);
+    },
+    setProfilePending: (state, payload) => {
+      Vue.set(state, 'profilePending', payload);
+    },
+    setProfileStatus: (state, payload) => {
+      Vue.set(state, 'profileStatus', payload);
+    },
+    setUserPending: (state, payload) => {
+      Vue.set(state, 'userPending', payload);
+    },
+    setUserStatus: (state, payload) => {
+      Vue.set(state, 'userStatus', payload);
+    },
+    setFollowPending: (state, payload) => {
+      Vue.set(state, 'followPending', payload);
+    },
+    setFollowStatus: (state, payload) => {
+      Vue.set(state, 'followStatus', payload);
+    },
+    /*
+    incP: (state, payload) => {
+      Vue.set(state, 'state.p', state.p + payload);
+    },*/
   },
   actions: {
-    postPublic: (context) => {
-      context.commit('setPostsPending', true);
+    postGet: (context, { id }) => {
+      if (this.state.posts.some((post) => {
+        return post.id == id; // no type checking since param
+      })) {
+        return;
+      }
+      const options = {
+        url: `${context.state.api}/post?id=${id}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+      }
+      context.commit('setPostPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setPostStatus', true);
+        context.commit('addPosts', response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setPostStatus', false);
+      })
+      .finally(() => {
+        context.commit('setPostPending', false);
+      })
+    },
+    postPost: (context, { payload }) => {
+      const options = {
+        url: `${context.state.api}/post`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+        data: {
+          payload: payload
+        }
+      }
+      context.commit('setPostPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setPostStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setPostStatus', false);
+      })
+      .finally(() => {
+        context.commit('setPostPending', false);
+      })
+    },
+    postPut: (context, { id, payload }) => {
+      const options = {
+        url: `${context.state.api}/post?id=${id}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+        data: {
+          payload: payload
+        }
+      }
+      context.commit('setPostPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setPostPending', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setPostStatus', false);
+      })
+      .finally(() => {
+        context.commit('setPostPending', false);
+      })
+    },
+    postDelete: (context, { id }) => {
+      const options = {
+        url: `${context.state.api}/post?id=${id}`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        }
+      }
+      context.commit('setPostPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setPostStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setPostStatus', false);
+      })
+      .finally(() => {
+        context.commit('setPostPending', false);
+      })
+    },
+    votePut: (context, { id }) => {
+      const options = {
+        url: `${context.state.api}/post/vote?id=${id}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        }
+      }
+      context.commit('setVotePending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setVoteStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setVoteStatus', false);
+      })
+      .finally(() => {
+        context.commit('setVotePending', false);
+      })
+    },
+    voteDelete: (context, { id }) => {
+      const options = {
+        url: `${context.state.api}/post/vote?id=${id}`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        }
+      }
+      context.commit('setVotePending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setVoteStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setVoteStatus', false);
+      })
+      .finally(() => {
+        context.commit('setVotePending', false);
+      })
+    },
+    commentPut: (context, {id, payload }) => {
+      const options = {
+        url: `${context.state.api}/post/comment?id=${id}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+        data: {
+          payload: payload
+        }
+      }
+      context.commit('setCommentPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setCommentStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setCommentStatus', false);
+      })
+      .finally(() => {
+        context.commit('setCommentPending', false);
+      })
+    },
+    publicGet: (context) => {
       const options = {
         url: `${context.state.api}/post/public`,
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         }
       }
+      context.commit('setPublicPending', true);
       axios(options)
       .then((response) => {
-        context.commit('addPosts', response.data)
-        context.commit('setTokenStatus', true);
+        console.log(response);
+        context.commit('setPublicStatus', true);
+        context.commit('setPublic', response.data.posts);
       })
       .catch((error) => {
         console.log(error);
-        context.commit('setPostsStatus', false);
+        context.commit('setPublicStatus', true);
       })
       .finally(() => {
-        context.commit('setPostsPending', false);
+        context.commit('setPublicPending', false);
       })
     },
-    authLogin: (context, { username, password }) => {
-      context.commit('setTokenPending', true);
-      context.commit('setToken', null);
+    loginPost: (context, { username, password }) => {
       const options = {
         url: `${context.state.api}/auth/login`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        'data': {
+        data: {
           username: username,
           password: password
         }
       }
+      context.commit('setAuthPending', true);
       axios(options)
       .then((response) => {
+        console.log(response);
+        context.commit('setAuthStatus', true);
         context.commit('setToken', response.data.token);
-        context.commit('setTokenStatus', true);
-        context.commit('clearPosts');
-        context.dispatch('userFeed');
       })
       .catch((error) => {
         console.log(error);
-        context.commit('setToken', null);
-        context.commit('setTokenStatus', false);
+        context.commit('setAuthStatus', false);
       })
       .finally(() => {
-        context.commit('setTokenPending', false);
+        context.commit('setAuthPending', false);
       })
     },
-    authLogout: (context) => {
-      context.commit('setToken', null);
-      context.commit('setTokenStatus', true);
-      context.commit('setTokenPending', false);
-      context.commit('clearPosts');
-      context.dispatch('postPublic');
-    },
-    authSignup: (context, { username, password, email, name }) => {
-      context.commit('setTokenPending', true);
-      context.commit('setToken', null);
+    /*
+    logout
+    */
+    signupPost: (context, { username, password, email, name }) => {
       const options = {
         url: `${context.state.api}/auth/signup`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        'data': {
+        data: {
           username: username,
           password: password,
           email: email,
           name: name
         }
       }
+      context.commit('setAuthPending', true);
       axios(options)
       .then((response) => {
+        console.log(response);
+        context.commit('setAuthStatus', true);
         context.commit('setToken', response.data.token);
-        context.commit('setTokenStatus', true);
-        context.commit('clearPosts');
       })
       .catch((error) => {
         console.log(error);
         context.commit('setToken', null);
-        context.commit('setTokenStatus', false);
+        context.commit('setAuthStatus', true);
       })
       .finally(() => {
-        context.commit('setTokenPending', false);
+        context.commit('setAuthPending', false);
       })
     },
-    user: (context, { username }) => {
-      if (!(username in this.users)) {
-        context.commit('setUsersPending', true);
-        const options = {
-          url: `${context.state.api}/user?username=${username}`,
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Token ${context.state.token}`
-          }
-        }
-        axios(options)
-        .then((response) => {
-          context.commit('addUser', response.data);
-          context.commit('setUsersStatus', true);
-        })
-        .catch((error) => {
-          console.log(error);
-          context.commit('setUsersStatus', false);
-        })
-        .finally(() => {
-          context.commit('setUsersPending', false);
-        })
-      }
-    },
-    userFeed: (context) => {
-      context.commit('setPostsPending', true);
+    feedGet: (context) => {
       const options = {
         url: `${context.state.api}/user/feed?p=${context.state.p}&n=${context.state.n}`,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Token ${context.state.token}`,
+          Authorization: `Token ${context.state.token}`
         }
       }
+      context.commit('setFeedPending', true);
       axios(options)
       .then((response) => {
-        context.commit('setPostsStatus', true);
-        context.commit('addPosts', response.data);
-        context.commit('incP', response.data.posts.length);
-
+        console.log(response);
+        context.commit('setFeedStatus', true);
+        context.commit('addFeed')
+        context.commit('adjustFeed', response.data.length);
       })
       .catch((error) => {
         console.log(error);
-        context.commit('setPostsStatus', false);
+        context.commit('setFeedStatus', false);
       })
       .finally(() => {
-        context.commit('setPostsPending', false);
+        context.commit('setFeedPending', false);
+      })
+    },
+    profileGet: (context) => {
+      const options = {
+        url: `${context.state.api}/user`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        }
+      }
+      context.commit('setProfilePending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setProfileStatus', true);
+        context.commit('setProfile', response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setProfileStatus', false);
+      })
+      .finally(() => {
+        context.commit('setProfilePending', false);
+      })
+    },
+    profilePut: (context, { payload }) => {
+      const options = {
+        url: `${context.state.api}/user`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+        data: {
+          payload: payload
+        }
+      }
+      context.commit('setProfilePending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setProfileStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setProfileStatus', false);
+      })
+      .finally(() => {
+        context.commit('setProfilePending', false);
+      })
+    },
+    userGet: (context, { username }) => {
+      if (this.state.users.some((user) => {
+        return user.username === username;
+      })) {
+        return;
+      }
+      const options = {
+        url: `${context.state.api}/user?username=${username}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        }
+      }
+      context.commit('setUserPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setUserStatus', true);
+        context.commit('addUser', response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setUserStatus', false);
+      })
+      .finally(() => {
+        context.commit('setUserPending', false);
+      })
+    },
+    followPut: (context, { username }) => {
+      const options = {
+        url: `${context.state.api}/user/follow?username=${username}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+      }
+      context.commit('setFollowPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setFollowStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setFollowStatus', false);
+      })
+      .finally(() => {
+        context.commit('setFollowPending', false);
+      })
+    },
+    unfollowPut: (context, { username }) => {
+      const options = {
+        url: `${context.state.api}/user/unfollow?username=${username}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${context.state.token}`
+        },
+      }
+      context.commit('setFollowPending', true);
+      axios(options)
+      .then((response) => {
+        console.log(response);
+        context.commit('setFollowStatus', true);
+      })
+      .catch((error) => {
+        console.log(error);
+        context.commit('setFollowStatus', false);
+      })
+      .finally(() => {
+        context.commit('setFollowPending', false);
       })
     }
   },

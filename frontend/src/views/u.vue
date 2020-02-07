@@ -4,22 +4,22 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
-            {{ user.username }}
+            {{ userContent.username }}
           </h1>
           <h2 class="is-6">
-            email: {{ user.email }}
+            email: {{ userContent.email }}
             <br />
-            name: {{ user.name }}
+            name: {{ userContent.name }}
             <br />
-            #followers: {{ user.following.length }}
+            #followers: {{ userContent.following.length }}
             <br />
-            #followed: {{ user.followed_num }}
+            #followed: {{ userContent.followed_num }}
           </h2>
         </div>
       </div>
     </div>
     <Post class="container"
-      v-for="post in user.posts"
+      v-for="post in userContent.posts"
       :key="post"
       :post="postContent(post)"
     />
@@ -28,6 +28,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 export default {
   name: 'userPage',
   props: {
@@ -36,13 +37,21 @@ export default {
   computed: {
     ...mapGetters([
         'getUser',
-        'getPost'
+        'getPost',
+        'getUsers'
     ]),
-    user() {
+    userContent() {
+      this.user(this.$props.username);
+      console.log(this.getUsers);
+      console.log(this.$props.username);
+      console.log(this.getUser(this.$props.username))
       return this.getUser(this.$props.username);
     }
   },
   methods: {
+    ...mapActions([
+      'user'
+    ]),
     postContent(id) {
       return this.getPost(id);
     }
