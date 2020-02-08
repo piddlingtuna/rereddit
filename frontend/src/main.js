@@ -7,8 +7,26 @@ import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
 Vue.config.productionTip = false
+/*
+import { library } from '@fortawesome/fontawesome-svg-core';
+// internal icons
+import { faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
+    faArrowUp, faAngleRight, faAngleLeft, faAngleDown,
+    faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload, faSort } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-Vue.use(Buefy)
+library.add(faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
+    faArrowUp, faAngleRight, faAngleLeft, faAngleDown,
+    faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload, faSort);
+Vue.component('vue-fontawesome', FontAwesomeIcon);
+
+Vue.use(Buefy, {
+  defaultIconComponent: 'vue-fontawesome',
+  defaultIconPack: 'fas',
+});
+*/
+
+Vue.use(Buefy);
 
 import Navbar from '@/components/Navbar.vue';
 import SignupModal from '@/components/SignupModal.vue';
