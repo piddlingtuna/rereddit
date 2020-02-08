@@ -20,6 +20,9 @@
         </b-navbar-item>
         <b-navbar-item tag="div">
           <div v-if="getToken" class="buttons">
+            <a class="button is-white" @click="PostModal = true">
+              Post
+            </a>
             <a class="button is-white" @click="profile">
               Profile
             </a>
@@ -61,6 +64,13 @@
       <LoginModal />
     </b-modal>
     <b-modal
+      :active.sync="PostModal"
+      has-modal-card
+      trap-focus
+    >
+      <PostModal />
+    </b-modal>
+    <b-modal
       :active.sync="LogoutModal"
       has-modal-card
       trap-focus
@@ -76,6 +86,7 @@ export default {
   name: 'navbar',
   data() {
     return {
+      PostModal: false,
       SignupModal: false,
       LoginModal: false,
       LogoutModal: false
@@ -94,6 +105,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>
