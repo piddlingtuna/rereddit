@@ -21,11 +21,31 @@
               <a v-else>
                 s/{{ post.meta.subseddit }}
               </a>
-            </h2>
-            <h2 class="is-6">
-              {{ post.text }}
               <br />
               {{ pubDate(post.meta.published) }}
+              <br />
+              <strong>{{ post.meta.upvotes.length }}</strong> upvotes
+            </h2>
+            <h2 class="subtitle is-6">
+              {{ post.text }}
+              <br />
+              <a
+                v-if="!post.meta.upvotes.includes(getProfile.id)"
+                @click="upvote"
+              >
+                upvote
+              </a>
+              <a
+                v-else
+                @click="downvote"
+              >
+                downvote
+              </a>
+              |
+              <a
+              >
+                comment
+              </a>
             </h2>
           </div>
         </div>
@@ -63,7 +83,8 @@ export default {
   computed: {
     ...mapGetters([
       'getToken',
-      'getApi'
+      'getApi',
+      'getProfile'
     ])
   },
   methods: {
@@ -95,6 +116,53 @@ export default {
     },
     sub() {
       this.$router.push({ path: `/s/${this.post.meta.subseddit}` });
+    },
+    upvote() {
+      const options = {
+        url: `${this.getApi}/post/vote?id=${this.post.id}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then(() => {
+        this.post.meta.upvotes.push(this.getProfile.id);
+        this.status = true;
+        console.log(this.post.meta.upvotes)
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    downvote() {
+      const options = {
+        url: `${this.getApi}/post/vote?id=${this.post.id}`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        }
+      }
+      this.pending = true;
+      axios(options)
+      .then(() => {
+        this.post.meta.upvotes.splice(this.post.meta.upvotes.indexOf(this.getProfile.id), 1);
+        this.status = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
     }
   },
   created() {

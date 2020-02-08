@@ -35,7 +35,7 @@
         <br />
         <div v-if="getToken">
           <a
-            v-if="!(getProfile.id in post.meta.upvotes)"
+            v-if="!post.meta.upvotes.includes(getProfile.id)"
             @click="upvote"
           >
             upvote
@@ -48,7 +48,6 @@
           </a>
           |
           <a
-            tag="router-link"
           >
             comment
           </a>
