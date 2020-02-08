@@ -4,29 +4,39 @@
       <div class="hero is-info">
         <div class="hero-body">
           <div class="container">
-            <h1 class="title">
-              {{ post.title }}
-            </h1>
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-96x96">
+                  <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                </figure>
+              </div>
+              <div class="media-content">
+                <h1 class="title">
+                  {{ post.title }}
+                </h1>
+                <h2 class="subtitle is-6">
+                  <a v-if="getToken" tag="router-link" @click="author">
+                    u/{{ post.meta.author }}
+                  </a>
+                  <a v-else>
+                    u/{{ post.meta.author }}
+                  </a>
+                  |
+                  <a v-if="getToken" tag="router-link" @click="sub">
+                    s/{{ post.meta.subseddit }}
+                  </a>
+                  <a v-else>
+                    s/{{ post.meta.subseddit }}
+                  </a>
+                  <br />
+                  {{ pubDate(post.meta.published) }}
+                  <br />
+                  <strong>{{ post.meta.upvotes.length }}</strong> upvotes
+                </h2>
+              </div>
+            </div>
             <h2 class="subtitle is-6">
-              <a v-if="getToken" tag="router-link" @click="author">
-                u/{{ post.meta.author }}
-              </a>
-              <a v-else>
-                u/{{ post.meta.author }}
-              </a>
-              |
-              <a v-if="getToken" tag="router-link" @click="sub">
-                s/{{ post.meta.subseddit }}
-              </a>
-              <a v-else>
-                s/{{ post.meta.subseddit }}
-              </a>
               <br />
-              {{ pubDate(post.meta.published) }}
-              <br />
-              <strong>{{ post.meta.upvotes.length }}</strong> upvotes
-            </h2>
-            <h2 class="subtitle is-6">
               {{ post.text }}
               <br />
               <a
