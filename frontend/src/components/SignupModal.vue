@@ -104,7 +104,6 @@ export default {
       this.pending = true;
       axios(options)
       .then((response) => {
-        console.log(response);
         this.setToken(response.data.token);
         this.status = true;
       })

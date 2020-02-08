@@ -8,11 +8,13 @@
               {{ user.username }}      
               <div class="button is-white"
                 v-if="(user.username != getProfile.username) && !getProfile.following.includes(user.id)"
+                @click="follow"
               >
                 Follow
               </div>
               <div class="button is-white"
                 v-if="(user.username != getProfile.username) && getProfile.following.includes(user.id)"
+                @click="unfollow"
               >
                 Unfollow
               </div>
@@ -33,7 +35,6 @@
               <br />
               #following: {{ user.followed_num }}
             </h2>
-
           </div>
         </div>
       </div>
@@ -65,7 +66,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import axios from 'axios';
 export default {
   name: 'userPage',
@@ -84,12 +85,16 @@ export default {
   },
   computed: {
     ...mapGetters([
-        'getToken',
-        'getProfile',
-        'getApi'
+      'getToken',
+      'getProfile',
+      'getApi'
     ])
   },
   methods: {
+    ...mapMutations([
+      'addFollow',
+      'removeFollow'
+    ]),
     getUser() {
       const options = {
         url: `${this.getApi}/user?username=${this.username}`,
@@ -155,6 +160,52 @@ export default {
       .catch((error) => {
         console.log(error);
         this.status = false;
+      })
+    },
+    follow() {
+      const options = {
+        url: `${this.getApi}/user/follow?username=${this.username}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        },
+      }
+      this.pending = true;
+      axios(options)
+      .then(() => {
+        this.status = true;
+        this.addFollow(this.user.id);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+    },
+    unfollow() {
+       const options = {
+        url: `${this.getApi}/user/unfollow?username=${this.username}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${this.getToken}`
+        },
+      }
+      this.pending = true;
+      axios(options)
+      .then(() => {
+        this.status = true;
+        this.removeFollow(this.user.id);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.status = false;
+      })
+      .finally(() => {
+        this.pending = false;
       })
     }
   },

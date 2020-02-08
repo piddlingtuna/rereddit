@@ -49,6 +49,12 @@ export default new Vuex.Store({
     },
     setProfile: (state, payload) => {
       Vue.set(state, 'profile', payload);
+    },
+    addFollow: (state, id) => {
+      state.profile.following.push(id);
+    },
+    removeFollow: (state, id) => {
+      state.profile.following.splice(state.profile.following.indexOf(id), 1);
     }
   }
 })

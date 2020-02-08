@@ -39,7 +39,7 @@
     <div v-else-if="pending">
       The page is loading.
     </div>
-    <div>
+    <div v-else>
       An error has occurred.
     </div>
   </div>

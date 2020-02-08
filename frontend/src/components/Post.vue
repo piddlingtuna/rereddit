@@ -10,7 +10,7 @@
         <div class="media-content">
           <p class="title is-4">{{ post.title }}</p>
           <p class="subtitle is-6">
-            <a v-if="getToken && post.meta.author !== getProfile.username" tag="router-link" @click="author">
+            <a v-if="getToken" tag="router-link" @click="author">
               u/{{ post.meta.author }}
             </a>
             <a v-else>
