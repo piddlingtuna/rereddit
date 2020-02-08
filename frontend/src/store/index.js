@@ -1,19 +1,27 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createPersistedState from "vuex-persistedstate";
+// import * as Cookies from 'js-cookie';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  plugins: [
+    createPersistedState({
+      paths: ['token', 'profile'],
+    })
+  ],
   state: {
     api: 'http://127.0.0.1:5000',
     token: null,
+    profile: null,
     about: [
       {
         title: 'Author',
         content: 'Michael Gribben'
       }, {
         title: 'Frontend',
-        content: 'Javascript, Vue.js, Vue.js Router, Vuex, Buefy'
+        content: 'Javascript, Vue.js, Vue Ruter, Vuex, Vuex Persistedstate, Buefy'
       }, {
         title: 'Backend',
         content: 'Python, Flask'
