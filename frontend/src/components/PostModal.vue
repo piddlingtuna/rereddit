@@ -89,8 +89,9 @@ export default {
         subseddit: this.sub,
       };
       if (this.file) {
-        // do smthn
+        // do something
       }
+      console.log('bye')
       const options = {
         url: `${this.getApi}/post`,
         method: 'POST',
