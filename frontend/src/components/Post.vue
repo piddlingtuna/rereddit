@@ -35,6 +35,13 @@
         <br />
         <div v-if="getToken">
           <a
+            tag="router-link"
+            @click="comments"
+          >
+            <strong>see more</strong>
+          </a>
+          |
+          <a
             v-if="!post.meta.upvotes.includes(getProfile.id)"
             @click="upvote"
           >
@@ -47,20 +54,50 @@
             downvote
           </a>
           |
-          <a
-          >
+          <a @click="CommentModal = true">
             comment
           </a>
           |
-          <a
-            tag="router-link"
-            @click="comments"
-          >
-            show comments
-          </a>
+          <span v-if="post.meta.author === getProfile.username">
+            |
+            <a @click="EditModal = true">
+              edit
+            </a>
+            |
+            <a @click="DeleteModal = true">
+              delete
+            </a>
+          </span>
         </div>
       </div>
     </div>
+    <b-modal
+      :active.sync="CommentModal"
+      has-modal-card
+      trap-focus
+    >
+      <CommentModal
+        :post="post"
+      />
+    </b-modal>
+    <b-modal
+      :active.sync="EditModal"
+      has-modal-card
+      trap-focus
+    >
+      <EditModal
+        :post="post"
+      />
+    </b-modal>
+    <b-modal
+      :active.sync="DeleteModal"
+      has-modal-card
+      trap-focus
+    >
+      <DeleteModal
+        :id="post.id"
+      />
+    </b-modal>
   </div>
 </template>
 
@@ -75,7 +112,10 @@ export default {
   data() {
     return {
       pending: null,
-      status: null
+      status: null,
+      CommentModal: false,
+      EditModal: false,
+      DeleteModal: false
     }
   },
   computed: {
@@ -109,7 +149,6 @@ export default {
       .then(() => {
         this.post.meta.upvotes.push(this.getProfile.id);
         this.status = true;
-        console.log(this.post.meta.upvotes)
       })
       .catch((error) => {
         console.log(error);

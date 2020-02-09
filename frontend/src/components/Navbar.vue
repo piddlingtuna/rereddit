@@ -100,7 +100,9 @@ export default {
   },
   methods: {
     profile() {
-      this.$router.push({ path: `/u/${this.getProfile.username}` });
+      if (this.$route.path !== `/u/${this.getProfile.username}`) {
+        this.$router.push({ path: `/u/${this.getProfile.username}` });
+      }
     }
   }
 }

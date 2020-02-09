@@ -52,10 +52,19 @@
                 downvote
               </a>
               |
-              <a
-              >
+              <a @click="CommentModal = true">
                 comment
               </a>
+              <span v-if="post.meta.author === getProfile.username">
+                |
+                <a @click="EditModal = true">
+                  edit
+                </a>
+                |
+                <a @click="DeleteModal = true">
+                  delete
+                </a>
+              </span>
             </h2>
           </div>
         </div>
@@ -72,6 +81,33 @@
     <div v-else>
       An error has occurred.
     </div>
+    <b-modal
+      :active.sync="CommentModal"
+      has-modal-card
+      trap-focus
+    >
+      <CommentModal
+        :post="post"
+      />
+    </b-modal>
+    <b-modal
+      :active.sync="EditModal"
+      has-modal-card
+      trap-focus
+    >
+      <EditModal
+        :post="post"
+      />
+    </b-modal>
+    <b-modal
+      :active.sync="DeleteModal"
+      has-modal-card
+      trap-focus
+    >
+      <DeleteModal
+        :id="id"
+      />
+    </b-modal>
   </div>
 </template>
 
@@ -86,6 +122,9 @@ export default {
   data() {
     return {
       post: null,
+      CommentModal: false,
+      EditModal: false,
+      DeleteModal: false,
       pending: null,
       status: null
     }
@@ -141,7 +180,6 @@ export default {
       .then(() => {
         this.post.meta.upvotes.push(this.getProfile.id);
         this.status = true;
-        console.log(this.post.meta.upvotes)
       })
       .catch((error) => {
         console.log(error);
