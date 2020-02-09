@@ -37,6 +37,7 @@ import EditModal from '@/components/EditModal.vue';
 import DeleteModal from '@/components/DeleteModal.vue';
 import FollowingModal from '@/components/FollowingModal.vue';
 import CommentModal from '@/components/CommentModal.vue';
+import EditProfileModal from '@/components/EditProfileModal.vue';
 import Post from '@/components/Post.vue';
 import Comment from '@/components/Comment.vue';
 import Info from '@/components/Info.vue';
@@ -50,6 +51,7 @@ Vue.component('EditModal', EditModal);
 Vue.component('DeleteModal', DeleteModal);
 Vue.component('FollowingModal', FollowingModal);
 Vue.component('CommentModal', CommentModal);
+Vue.component('EditProfileModal', EditProfileModal);
 Vue.component('Post', Post);
 Vue.component('Comment', Comment);
 Vue.component('Info', Info);
@@ -57,7 +59,7 @@ Vue.component('Info', Info);
 Vue.mixin({
   methods: {
     pubDate: ((timestamp) => {
-      const pub = new Date(parseInt(timestamp));
+      const pub = new Date(parseFloat(timestamp) * 1000);
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       return `Published ${pub.getHours()}:${pub.getMinutes()} ${days[pub.getDay()]}, ${pub.getDate()} ${months[pub.getMonth()]} ${pub.getFullYear()}`;

@@ -4,7 +4,7 @@
       <div class="media">
         <div class="media-left">
           <figure class="image is-96x96">
-            <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+            <img :src="this.post.image ? `data:image/png;base64, ${this.post.image}` : '../../default.png'" alt="Image">
           </figure>
         </div>
         <div class="media-content">

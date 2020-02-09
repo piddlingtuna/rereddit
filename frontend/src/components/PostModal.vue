@@ -28,6 +28,16 @@
           >
           </b-input>
         </b-field>
+        <b-field class="file">
+          <b-upload v-model="file">
+            <div class="button is-info">
+              Click to upload
+            </div>
+          </b-upload>
+          <span class="file-name" v-if="file">
+            {{ file.name }}
+          </span>
+        </b-field>
       </section>
       <footer class="modal-card-foot">
         <button class="button is-success"
@@ -60,7 +70,7 @@ export default {
       title: '',
       sub: '',
       text: '',
-      image: '',
+      file: null,
       pending: null,
       status: null,
     }
@@ -72,7 +82,15 @@ export default {
     ])
   },
   methods: {
-    post() {
+    async post() {
+      const payload = {
+        title: this.title,
+        text: this.text,
+        subseddit: this.sub,
+      };
+      if (this.file) {
+        // do smthn
+      }
       const options = {
         url: `${this.getApi}/post`,
         method: 'POST',
@@ -80,12 +98,7 @@ export default {
           'Content-Type': 'application/json',
           Authorization: `Token ${this.getToken}`
         },
-        data: {
-          title: this.title,
-          text: this.text,
-          subseddit: this.sub,
-          //image: this.image
-        }
+        data: payload
       }
       this.pending = true;
       axios(options)

@@ -57,6 +57,12 @@ export default new Vuex.Store({
     setProfile: (state, payload) => {
       Vue.set(state, 'profile', payload);
     },
+    setEmail: (state, payload) => {
+      Vue.set(state, 'profile.email', payload);
+    },
+    setName: (state, payload) => {
+      Vue.set(state, 'profile.name', payload);
+    },
     addFollow: (state, id) => {
       state.profile.following.push(id);
     },

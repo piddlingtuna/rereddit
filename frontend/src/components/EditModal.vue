@@ -2,7 +2,7 @@
   <form @submit.prevent>
     <div class="modal-card" style="width: 50rem">
       <header class="modal-card-head">
-        <p class="modal-card-title">Signup</p>
+        <p class="modal-card-title">Edit Post</p>
       </header>
       <section class="modal-card-body">
         <b-field label="Title">

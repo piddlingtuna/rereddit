@@ -88,6 +88,7 @@ export default {
       axios(options)
       .then(() => {
         this.status = true;
+        this.following.push(user);
         this.addFollow(user.id);
       })
       .catch((error) => {
@@ -111,6 +112,7 @@ export default {
       axios(options)
       .then(() => {
         this.status = true;
+        this.following.splice(this.following.indexOf(user), 1);
         this.removeFollow(user.id);
       })
       .catch((error) => {

@@ -14,17 +14,17 @@
               <br />
               #posts: {{ user.posts.length }}
               <br />
-              #followers: {{ user.following.length }}
+              #followers: {{ user.followed_num }}
               <br />
-              #following: {{ user.followed_num }}
+              #following: {{ following.length }}
               <br />
               <a
                 @click="followingModal = true"
               >
                 See Following
               </a>
+              |
               <span v-if="user.username != getProfile.username">
-                |
                 <a
                   v-if="!getProfile.following.includes(user.id)"
                   @click="follow"
@@ -36,6 +36,11 @@
                   @click="unfollow"
                 >
                   Unfollow
+                </a>
+              </span>
+              <span v-else>
+                <a @click="editProfileModal = true">
+                  Edit Profile
                 </a>
               </span>
             </h2>
@@ -66,6 +71,13 @@
     >
       <FollowingModal :following="following" />
     </b-modal>
+    <b-modal
+      :active.sync="editProfileModal"
+      has-modal-card
+      trap-focus
+    >
+      <editProfileModal :user="user"/>
+    </b-modal>
   </div>
 </template>
 
@@ -84,7 +96,8 @@ export default {
       following: [],
       pending: null,
       status: null,
-      followingModal: false
+      followingModal: false,
+      editProfileModal: false
     }
   },
   computed: {

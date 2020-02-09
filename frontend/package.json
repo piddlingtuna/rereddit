@@ -15,6 +15,7 @@
     "buefy": "^0.8.10",
     "core-js": "^3.4.4",
     "fontawesome": "^5.6.3",
+    "image-to-base64": "^2.0.1",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
     "vue": "^2.6.10",
