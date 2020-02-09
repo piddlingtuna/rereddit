@@ -57,7 +57,6 @@
           <a @click="CommentModal = true">
             comment
           </a>
-          |
           <span v-if="post.meta.author === getProfile.username">
             |
             <a @click="EditModal = true">

@@ -6,25 +6,8 @@
           <div class="container">
             <h1 class="title">
               {{ user.username }}      
-              <div class="button is-white"
-                v-if="(user.username != getProfile.username) && !getProfile.following.includes(user.id)"
-                @click="follow"
-              >
-                Follow
-              </div>
-              <div class="button is-white"
-                v-if="(user.username != getProfile.username) && getProfile.following.includes(user.id)"
-                @click="unfollow"
-              >
-                Unfollow
-              </div>
-              <div class="button is-white"
-                @click="followingModal = true"
-              >
-                See Following
-              </div>
             </h1>
-            <h2 class="is-6">
+            <h2 class="subtitle is-6">
               email: {{ user.email }}
               <br />
               name: {{ user.name }}
@@ -34,6 +17,27 @@
               #followers: {{ user.following.length }}
               <br />
               #following: {{ user.followed_num }}
+              <br />
+              <a
+                @click="followingModal = true"
+              >
+                See Following
+              </a>
+              <span v-if="user.username != getProfile.username">
+                |
+                <a
+                  v-if="!getProfile.following.includes(user.id)"
+                  @click="follow"
+                >
+                  Follow
+                </a>
+                <a
+                  v-if="getProfile.following.includes(user.id)"
+                  @click="unfollow"
+                >
+                  Unfollow
+                </a>
+              </span>
             </h2>
           </div>
         </div>
@@ -217,6 +221,6 @@ export default {
 
 <style scoped>
 .button {
-  margin-left: 1rem;
+  margin-right: 1rem;
 }
 </style>
