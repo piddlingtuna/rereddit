@@ -48,7 +48,7 @@
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 export default {
-  name: 'postModal',
+  name: 'editModal',
   props: {
     post: Object
   },

@@ -9,7 +9,6 @@
           <b-input
             type="email"
             v-model="email"
-            :placeholder="user.email"
           >
           </b-input>
         </b-field>
@@ -17,7 +16,6 @@
           <b-input
             type="text"
             v-model="name"
-            :placeholder="user.name"
           >
           </b-input>
         </b-field>
@@ -56,14 +54,14 @@
 import { mapGetters, mapMutations } from 'vuex';
 import axios from 'axios';
 export default {
-  name: 'postModal',
+  name: 'editProfileModal',
   props: {
     user: Object
   },
   data() {
     return {
-      email: '',
-      name: '',
+      email: this.user.email,
+      name: this.user.name,
       password: '',
       pending: null,
       status: null,
